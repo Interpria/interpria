@@ -1,0 +1,104 @@
+export type User = {
+    user_id: number;
+    email: string;
+    name: string;
+    role: 'traveler' | 'interpreter'| 'attraction' | 'admin';
+    phone_num: string;
+    created_at: Date;
+    updated_at: Date;
+};
+  
+export type Interpreter = {
+  interpreter_id: number;
+  user_id: number;
+  gender: 'male' | 'female' | 'other';
+  bio: string;
+  introduction: string;
+  primary_language_id: number;
+  created_at: Date;
+  updated_at: Date;
+};
+
+export type Language = {
+  language_id: number;
+  code: string;
+  name: string;
+  created_at: Date;
+  updated_at: Date;
+};
+
+export type Attraction = {
+  attraction_id: number;
+  name: string;
+  description: string;
+  address: string;
+  postal_code: string;
+  city: string;
+  country: string;
+  email: string;
+  phone: string;
+  is_closed: boolean;
+  website: string;
+  category: 'museum' | 'art' | 'nature' | 'history' | 'other';
+  longitude: number;
+  latitude: number;
+  created_at: Date;
+  updated_at: Date;
+};
+
+export type Interpreterxlanguage = {
+  interpreterxlanguage_id: number;
+  interpreter_id: number;
+  language_id: number;
+  created_at: Date;
+  updated_at: Date;
+};
+
+export type Interpreterxattraction = {
+  interpreterxattraction_id: number;
+  interpreter_id: number;
+  attraction_id: number;
+  duration: number;
+  buffer_time: number;
+  max_traveler: number;
+  price: number;
+  created_at: Date;
+  updated_at: Date;
+};
+
+export type AvailabilityAttraction = {
+  availability_id: number;
+  attraction_id: number;
+  weekday: number;
+  start_time: string;
+  end_time: string;
+  created_at: Date;
+  updated_at: Date;
+};
+
+export type AvailabilityInterpreter = {
+  availability_id: number;
+  interpreter_id: number;
+  attraction_id: number;
+  weekday: number;
+  date: Date;
+  start_time: string;
+  end_time: string;
+  created_at: Date;
+  updated_at: Date;
+};
+
+export type Booking = {
+  booking_id: number;
+  traveler_id: number;
+  interpreter_id: number;
+  attraction_id: number;
+  start_time: string;
+  end_time: string;
+  language_id: number;
+  num_traveler: number;
+  price: number;
+  status: 'pending' | 'confirmed' | 'cancelled' | 'completed';
+  created_at: Date;
+  updated_at: Date;
+};
