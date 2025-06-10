@@ -1,4 +1,5 @@
 import {fetchAvailabilityAttraction} from '@/app/lib/data';
+import Link from 'next/link';
 
 export default async function AvailabilityAttractionPage() {
   const availabilityAttractions = await fetchAvailabilityAttraction();
@@ -15,6 +16,7 @@ export default async function AvailabilityAttractionPage() {
                 <th scope="col">weekday</th>
                 <th scope="col">start_time</th>
                 <th scope="col">end_time</th>
+                <th scope="col">actions</th>
               </tr>
             </thead>
             <tbody>

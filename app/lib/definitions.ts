@@ -2,7 +2,7 @@ export type User = {
     user_id: number;
     email: string;
     name: string;
-    role: 'traveler' | 'interpreter'| 'attraction' | 'admin';
+    role: 'user' | 'attraction' | 'admin';
     phone_num: string;
     created_at: Date;
     updated_at: Date;
@@ -64,6 +64,7 @@ export type Interpreterxattraction = {
   price: number;
   created_at: Date;
   updated_at: Date;
+  attraction_name: string;
 };
 
 export type AvailabilityAttraction = {
