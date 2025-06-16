@@ -1,99 +1,104 @@
-import { fetchAttractionById } from '@/app/lib/data';
+import { fetchAttractionById, fetchInterpreterxattractionByAttractionId } from '@/app/api/attraction/route';
+import { fetchInterpreterById } from '@/app/api/interpreter/route';
 import Link from 'next/link';
+import { Interpreterxattraction, Interpreter, User } from '@/app/lib/definitions';
+import DeleteAttractionButton from '../DeleteAttractionButton';
+import { useState, useEffect } from 'react';
 
 export default async function AttractionDetailsPage({
   params,
 }: {
-  params: Promise<{ id: string }>
+  params: { id: string };
 }) {
-  const { id } = await params;
-  const attraction = await fetchAttractionById(parseInt(id));
+  const id = params.id;
+  const attractionId = parseInt(id);
+  
+  // First fetch attraction and interpreterxattraction
+  const [attraction, interpreterxattraction] = await Promise.all([
+    fetchAttractionById(attractionId),
+    fetchInterpreterxattractionByAttractionId(attractionId)
+  ]);
+
+  // Then fetch all interpreter details
+  const interpreterById = interpreterxattraction.length > 0 
+    ? await Promise.all(
+        interpreterxattraction.map(ia => fetchInterpreterById(ia.interpreter_id))
+      ).then(results => results.flat())
+    : [];
+
   return (
-    <div className='container py-5'>
-      <div className='mb-4'>
-        <Link href="/dashboard/attraction" className='btn btn-secondary'>
-          ← Back to Attraction List
-        </Link>
-      </div>
+    <div className='container py-4'>
+      <div className='row'>
+        <div className='col-md-12'>
+          <div className='d-flex justify-content-between align-items-center mb-4'>
+            <h2 className='mb-0'>{attraction[0].name}</h2>
+            <DeleteAttractionButton attractionId={attractionId} />
+          </div>
+          <div className='card mb-4'>
+            <div className='card-body'>
+              <h5 className='card-title'>Details</h5>
+              <div className='card-text'>
+                <p><strong>Description:</strong> {attraction[0].description}</p>
+                <p><strong>Address:</strong> {attraction[0].address}</p>
+                <p><strong>Postal Code:</strong> {attraction[0].postal_code}</p>
+                <p><strong>City:</strong> {attraction[0].city}</p>
+                <p><strong>Province:</strong> {attraction[0].province}</p>
+                <p><strong>Country:</strong> {attraction[0].country}</p>
+                <p><strong>Email:</strong> {attraction[0].email}</p>
+                <p><strong>Phone:</strong> {attraction[0].phone}</p>
+                <p><strong>Website:</strong> {attraction[0].website}</p>
+                <p><strong>Category:</strong> {attraction[0].category}</p>
+                <p><strong>Longitude:</strong> {attraction[0].longitude}</p>
+                <p><strong>Latitude:</strong> {attraction[0].latitude}</p>
+                <p><strong>Is Closed:</strong> {attraction[0].is_closed ? 'Yes' : 'No'}</p>
+              </div>
+            </div>
+          </div>
 
-      <div className='card'>
-        <div className='card-header'>
-          <h1 className='card-title mb-0'>{attraction[0].name}</h1>
-        </div>
-      </div>
+          <div className='card mb-4'>
+            <div className='card-body'>
+              <h5 className='card-title'>Available Interpreters</h5>
+              {interpreterxattraction.length > 0 ? (
+                <div className='row g-3'>
+                  {interpreterxattraction.map((interpreter) => {
+                    const interpreterUsers = interpreterById.filter(
+                      (interpreterData) => interpreterData.interpreter_id === interpreter.interpreter_id
+                    );
+                    
+                    if (!interpreterUsers || interpreterUsers.length === 0) {
+                      return null;
+                    }
 
-      <div className='card-body mt-3'>
-        <div className='row'>
-          <div className='col-md-8'>
-            <h3>Attraction Information</h3>
-            <table className='table'>
-              <tbody>
-                <tr>
-                  <th>ID:</th>
-                  <td>{attraction[0].attraction_id}</td>
-                </tr>
-                <tr>
-                  <th>Name:</th>
-                  <td>{attraction[0].name}</td>
-                </tr>
-                <tr>
-                  <th>Description:</th>
-                  <td>{attraction[0].description}</td>
-                </tr>
-                <tr>
-                  <th>Address:</th>
-                  <td>{attraction[0].address}</td>
-                </tr>
-                <tr>
-                  <th>Postal Code:</th>
-                  <td>{attraction[0].postal_code}</td>
-                </tr>
-                <tr>
-                  <th>City:</th>
-                  <td>{attraction[0].city}</td>
-                </tr>
-                <tr>
-                  <th>Country:</th>
-                  <td>{attraction[0].country}</td>
-                </tr>
-                <tr>
-                  <th>Email:</th>
-                  <td>{attraction[0].email}</td>
-                </tr>
-                <tr>
-                  <th>Phone:</th>
-                  <td>{attraction[0].phone}</td>
-                </tr>
-                <tr>
-                  <th>Is Closed:</th>
-                  <td>{attraction[0].is_closed ? 'Yes' : 'No'}</td>
-                </tr>
-                <tr>
-                  <th>Website:</th>
-                  <td>{attraction[0].website}</td>
-                </tr>
-                <tr>
-                  <th>Category:</th>
-                  <td>{attraction[0].category}</td>
-                </tr>
-                <tr>
-                  <th>Longitude:</th>
-                  <td>{attraction[0].longitude}</td>
-                </tr>
-                <tr>
-                  <th>Latitude:</th>
-                  <td>{attraction[0].latitude}</td>
-                </tr>
-                <tr>
-                  <th>Created At:</th>
-                  <td>{new Date(attraction[0].created_at).toLocaleDateString()}</td>
-                </tr>
-                <tr>
-                  <th>Updated At:</th>
-                  <td>{new Date(attraction[0].updated_at).toLocaleDateString()}</td>
-                </tr>
-              </tbody>
-            </table>
+                    const interpreterData = interpreterUsers[0];
+                    
+                    return (
+                      <div key={interpreter.interpreterxattraction_id} className='col-md-6'>
+                        <div className='card h-100'>
+                          <div className='card-body'>
+                            <h5 className='card-title'>
+                              <Link href={`/dashboard/interpreter/${interpreter.interpreter_id}`} className='text-decoration-none'>
+                                {interpreterData.name}
+                              </Link>
+                            </h5>
+                            <div className='card-text'>
+                              <ul className='list-unstyled mb-0'>
+                                <li>Duration: {interpreter.duration || 0} mins</li>
+                                <li>Buffer Time: {interpreter.buffer_time || 0} mins</li>
+                                <li>Max Travelers: {interpreter.max_traveler || 'No limit'}</li>
+                                <li>Price: {interpreter.price ? `${interpreter.price} CAD` : 'Free'}</li>
+                                <li>Language: {interpreterData.primary_language}{interpreterData.languages && (',' + interpreterData.languages)}</li>
+                              </ul>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              ) : (
+                <p className='text-muted mb-0'>No interpreters available for this attraction</p>
+              )}
+            </div>
           </div>
         </div>
       </div>

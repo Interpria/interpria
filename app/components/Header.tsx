@@ -4,14 +4,14 @@ export default function Header() {
   const heightLogo = 40;
   const widthLogo = 890 * heightLogo / 269;
   return (
-    <header   className="d-flex justify-content-around align-items-center py-2"
+    <header className="d-flex justify-content-around align-items-center py-3"
     style={{ backgroundColor: "var(--light-background)" }}> 
       <Link href='/'><Image src="/logo.png" alt="Logo" height={heightLogo} width={widthLogo} /></Link>
-      <h2 className='fs-3'>Admin Dashboard</h2> 
-      <Link href='/user/register' className='btn btn-outline-warning'>
+      <h2 className='fs-3' style={{ color: "var(--orange-deep)" }}>Welcome and select your destination</h2> 
+      <Link href='/auth/register' className='btn btn-outline-warning'>
         Register
       </Link>
-      <Link href='/user/login' className='btn btn-outline-warning'>
+      <Link href='/auth/login' className='btn btn-outline-warning'>
         Login
       </Link>
     </header> 

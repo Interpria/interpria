@@ -1,6 +1,13 @@
-import { fetchInterpreterById, fetchInterpreterxattractionByInterpreterId } from '@/app/lib/data';
+import { fetchInterpreterById, fetchAvailabilityInterpreterByInterpreterId } from '@/app/api/interpreter/route';
+import { fetchInterpreterxattractionByInterpreterId } from '@/app/api/interpreterxattraction/[id]/route';
 import Link from 'next/link';
 import { Interpreterxattraction } from '@/app/lib/definitions';
+import UpdateLanguagesButton from './UpdateLanguagesButton';
+import DeleteAttractionButton from './DeleteAttractionButton';
+import AddAvailabilityButton from './AddAvailabilityButton';
+import DeleteAvailabilityButton from './DeleteAvailabilityButton';
+
+const weekdays = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
 export default async function InterpreterDetailsPage({
   params,
@@ -11,9 +18,10 @@ export default async function InterpreterDetailsPage({
   const interpreterId = parseInt(id);
   
   // Fetch both interpreter details and attractions
-  const [interpreterUser, interpreterxattraction] = await Promise.all([
+  const [interpreterUser, interpreterxattraction, availabilityInterpreter] = await Promise.all([
     fetchInterpreterById(interpreterId),
-    fetchInterpreterxattractionByInterpreterId(interpreterId)
+    fetchInterpreterxattractionByInterpreterId(interpreterId),
+    fetchAvailabilityInterpreterByInterpreterId(interpreterId)
   ]);
 
   return (
@@ -56,7 +64,15 @@ export default async function InterpreterDetailsPage({
                   </tr>
                   <tr>
                     <th>Other Languages:</th>
-                    <td>{interpreterUser[0].languages}</td>
+                    <td>
+                      {interpreterUser[0].languages}
+                      <div className="mt-2">
+                        <UpdateLanguagesButton 
+                          interpreterId={interpreterUser[0].interpreter_id}
+                          currentLanguages={interpreterUser[0].languages}
+                        />
+                      </div>
+                    </td>
                   </tr>
                   <tr>
                     <th>Created At:</th>
@@ -98,33 +114,96 @@ export default async function InterpreterDetailsPage({
           <div className='row mt-4'>
             <div className='col-12'>
               <div className='d-flex justify-content-between align-items-center mb-3'>
-                <h3 className='mb-0'>Attractions to Interpret</h3>
+                <div className='d-flex align-items-center gap-3'>
+                  <h3 className='mb-0'>Attractions to Interpret</h3>
+                  <Link href={`/dashboard/interpreter/${interpreterId}/add-attraction`} className='btn btn-success'>
+                    Add Attraction
+                  </Link>
+                </div>
                 <span className='badge bg-primary'>{interpreterxattraction.length} Attractions</span>
               </div>
 
               {interpreterxattraction.length > 0 ? (
                 <div className='row g-3'>
-                  {(interpreterxattraction as Interpreterxattraction[]).map((attraction) => (
-                    <div key={attraction.interpreterxattraction_id} className='col-md-6'>
-                      <div className='card h-100'>
-                        <div className='card-body'>
-                          <h5 className='card-title'>
-                            <Link href={`/dashboard/attraction/${attraction.attraction_id}`} className='text-decoration-none'>
-                              {attraction.attraction_name}
-                            </Link>
-                          </h5>
-                          <div className='card-text'>
-                            <ul className='list-unstyled mb-0'>
-                              <li>Duration: {attraction.duration || 0} mins</li>
-                              <li>Price: {attraction.price ? `${attraction.price} CAD` : 'Free'}</li>
-                              <li>Buffer Time: {attraction.buffer_time || 0} mins</li>
-                              <li>Max Travelers: {attraction.max_traveler || 'No limit'}</li>
-                            </ul>
+                  {(interpreterxattraction as Interpreterxattraction[]).map((attraction) => {
+                    // Filter availability for this attraction
+                    const attractionAvailability = availabilityInterpreter.filter(
+                      avail => avail.attraction_id === attraction.attraction_id
+                    );
+
+                    return (
+                      <div key={attraction.interpreterxattraction_id} className='col-md-6'>
+                        <div className='card h-100'>
+                          <div className='card-body'>
+                            <div className='d-flex justify-content-between align-items-center mb-3'>
+                              <h5 className='card-title mb-0'>
+                                <Link href={`/dashboard/attraction/${attraction.attraction_id}`} className='text-decoration-none'>
+                                  {attraction.attraction_name}
+                                </Link>
+                              </h5>
+                              <DeleteAttractionButton 
+                                interpreterId={interpreterId}
+                                attractionId={attraction.attraction_id}
+                                attractionName={attraction.attraction_name}
+                              />
+                            </div>
+                            <div className='card-text'>
+                              <ul className='list-unstyled mb-0'>
+                                <li>Duration: {attraction.duration || 0} mins</li>
+                                <li>Price: {attraction.price ? `${attraction.price} CAD` : 'Free'}</li>
+                                <li>Buffer Time: {attraction.buffer_time || 0} mins</li>
+                                <li>Max Travelers: {attraction.max_traveler || 'No limit'}</li>
+                              </ul>
+                              <h6 className='mt-3 mb-2'>Availability:</h6>
+                              {attractionAvailability.length > 0 ? (
+                                <ul className='list-unstyled mb-0'>
+                                  {attractionAvailability
+                                    .sort((a, b) => a.weekday - b.weekday)
+                                    .map((availability) => (
+                                    <div key={availability.availability_id} className='mb-2'>
+                                      <p className='mr-3 d-inline'>{weekdays[availability.weekday]}</p>
+                                      {new Date(`2000-01-01T${availability.start_time}`).toLocaleTimeString('en-US', {
+                                        hour: 'numeric',
+                                        minute: '2-digit',
+                                        hour12: true
+                                      })} - {new Date(`2000-01-01T${availability.end_time}`).toLocaleTimeString('en-US', {
+                                        hour: 'numeric',
+                                        minute: '2-digit',
+                                        hour12: true
+                                      })}
+                                      <DeleteAvailabilityButton 
+                                        availabilityId={availability.availability_id}
+                                        weekday={weekdays[availability.weekday]}
+                                        startTime={new Date(`2000-01-01T${availability.start_time}`).toLocaleTimeString('en-US', {
+                                          hour: 'numeric',
+                                          minute: '2-digit',
+                                          hour12: true
+                                        })}
+                                        endTime={new Date(`2000-01-01T${availability.end_time}`).toLocaleTimeString('en-US', {
+                                          hour: 'numeric',
+                                          minute: '2-digit',
+                                          hour12: true
+                                        })}
+                                      />
+                                    </div>
+                                  ))}
+                                </ul>
+                              ) : (
+                                <p className='text-muted mb-0'>No availability set</p>
+                              )}
+                              <div className='mt-2'>
+                                <AddAvailabilityButton 
+                                  interpreterId={interpreterId}
+                                  attractionId={attraction.attraction_id}
+                                  attractionName={attraction.attraction_name}
+                                />
+                              </div>
+                            </div>
                           </div>
                         </div>
                       </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               ) : (
                 <div className='alert alert-info'>

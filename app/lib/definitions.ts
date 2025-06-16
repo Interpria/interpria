@@ -2,8 +2,9 @@ export type User = {
     user_id: number;
     email: string;
     name: string;
+    password_hash: string;
     role: 'user' | 'attraction' | 'admin';
-    phone_num: string;
+    phone: string;
     created_at: Date;
     updated_at: Date;
 };
@@ -21,7 +22,7 @@ export type Interpreter = {
 
 export type Language = {
   language_id: number;
-  code: string;
+  code: string | null;
   name: string;
   created_at: Date;
   updated_at: Date;
@@ -34,12 +35,13 @@ export type Attraction = {
   address: string;
   postal_code: string;
   city: string;
+  province: string | null;
   country: string;
-  email: string;
-  phone: string;
-  is_closed: boolean;
-  website: string;
-  category: 'museum' | 'art' | 'nature' | 'history' | 'other';
+  email: string | null;
+  phone: string | null;
+  is_closed: number;
+  website: string | null;
+  category: 'museum' | 'art' | 'nature' | 'historical' | 'other';
   longitude: number;
   latitude: number;
   created_at: Date;
@@ -97,7 +99,7 @@ export type Booking = {
   start_time: string;
   end_time: string;
   language_id: number;
-  num_traveler: number;
+  num_people: number;
   price: number;
   status: 'pending' | 'confirmed' | 'cancelled' | 'completed';
   created_at: Date;

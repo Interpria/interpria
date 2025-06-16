@@ -1,5 +1,8 @@
-import { fetchUserById } from '@/app/lib/data';
+import { fetchUserById } from '@/app/api/user/route';
+import { fetchBookingsByUserId } from '@/app/api/booking/route';
 import Link from 'next/link';
+import CreateBookingForm from './CreateBookingForm';
+import DeleteBookingButton from './DeleteBookingButton';
 
 export default async function UserDetailsPage({
   params,
@@ -7,7 +10,17 @@ export default async function UserDetailsPage({
   params: Promise<{ id: string }>
 }) {
   const { id } = await params;
-  const user = await fetchUserById(parseInt(id));
+  const userId = parseInt(id);
+  const [user, bookings] = await Promise.all([
+    fetchUserById(userId),
+    fetchBookingsByUserId(userId)
+  ]);
+
+  const formatDateTime = (dateTimeStr: string) => {
+    const date = new Date(dateTimeStr);
+    return date.toLocaleString();
+  };
+
   return (
     <div className='container py-5'>
       <div className='mb-4'>
@@ -52,10 +65,62 @@ export default async function UserDetailsPage({
                   <th>Updated At:</th>
                   <td>{new Date(user[0].updated_at).toLocaleDateString()}</td>
                 </tr>
+                <tr>
+                  <th>Interpreter ID:</th>
+                  <td>{user[0].interpreter_id ? <Link href={`/dashboard/interpreter/${user[0].interpreter_id}`}>{user[0].interpreter_id}</Link> : 'Not registered as interpreter'}</td>
+                </tr>
               </tbody>
             </table>
           </div>
         </div>
+
+        <div className='row mt-4'>
+          <div className='col-12'>
+            <div className='d-flex justify-content-between align-items-center mb-3'>
+              <h3 className='mb-0'>Bookings</h3>
+              <span className='badge bg-primary'>{bookings.length} Bookings</span>
+            </div>
+
+            {bookings.length > 0 ? (
+              <table className="table table-striped">
+                <thead>
+                  <tr>
+                    <th scope="col">Interpreter</th>
+                    <th scope="col">Attraction</th>
+                    <th scope="col">Start Time</th>
+                    <th scope="col">End Time</th>
+                    <th scope="col">Language</th>
+                    <th scope="col">People</th>
+                    <th scope="col">Price</th>
+                    <th scope="col">Status</th>
+                    <th scope="col">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {bookings.map((booking) => (
+                    <tr key={booking.booking_id}>
+                      <td>{booking.interpreter_name}</td>
+                      <td>{booking.attraction_name}</td>
+                      <td>{formatDateTime(booking.start_time)}</td>
+                      <td>{formatDateTime(booking.end_time)}</td>
+                      <td>{booking.language_name}</td>
+                      <td>{booking.num_people}</td>
+                      <td>{booking.price}</td>
+                      <td>{booking.status}</td>
+                      <td>
+                        <DeleteBookingButton bookingId={booking.booking_id} />
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            ) : (
+              <p className='text-muted mb-0'>No bookings found for this user</p>
+            )}
+          </div>
+        </div>
+
+        <CreateBookingForm userId={userId} userName={user[0].name} />
       </div>
     </div>
   );
