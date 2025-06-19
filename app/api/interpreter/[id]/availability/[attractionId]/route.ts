@@ -11,10 +11,11 @@ const conn = await mysql.createConnection({
 
 export async function DELETE(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const availabilityId = parseInt(params.id);
+    const { id } = await params;
+    const availabilityId = parseInt(id);
 
     if (isNaN(availabilityId)) {
       return NextResponse.json(

@@ -8,9 +8,9 @@ import { useState, useEffect } from 'react';
 export default async function AttractionDetailsPage({
   params,
 }: {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }) {
-  const id = params.id;
+  const { id } = await params;
   const attractionId = parseInt(id);
   
   // First fetch attraction and interpreterxattraction

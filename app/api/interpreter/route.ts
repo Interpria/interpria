@@ -44,31 +44,6 @@ export async function fetchInterpreter() {
   }
 }
 
-export async function fetchInterpreterById(id: number) {
-  try {
-    const [rows] = await conn.query(`
-      SELECT 
-        i.*,
-        u.*,
-        GROUP_CONCAT(DISTINCT l.name) as languages,
-        (SELECT l2.name FROM language l2 WHERE l2.language_id = i.primary_language_id) as primary_language
-      FROM interpreter i 
-      JOIN user u ON i.user_id = u.user_id
-      LEFT JOIN interpreterxlanguage il ON i.interpreter_id = il.interpreter_id
-      LEFT JOIN language l ON il.language_id = l.language_id
-      WHERE i.interpreter_id = ?
-      GROUP BY i.interpreter_id
-    `, [id]);
-    return rows as (Interpreter & User & {
-      languages: string;
-      primary_language: string;
-    })[];
-  }catch (error) {
-    console.error('Database Error:', error);
-    throw new Error('Failed to fetch interpreter data.');
-  }
-}
-
 export async function fetchAvailabilityInterpreter() {
   try {
     const [rows] = await conn.query('SELECT * FROM `availability_interpreter`');
@@ -79,22 +54,7 @@ export async function fetchAvailabilityInterpreter() {
   }
 }
 
-export async function fetchAvailabilityInterpreterByInterpreterId(id: number) {
-  try {
-    const [rows] = await conn.query(`
-      SELECT
-        ai.*,
-        a.attraction_id as attraction_id
-      FROM availability_interpreter ai
-      LEFT JOIN attraction a ON ai.attraction_id = a.attraction_id
-      WHERE ai.interpreter_id = ? 
-    `, [id]);
-    return rows as (AvailabilityInterpreter & { attraction_id: number })[];
-  }catch (error) {
-    console.error('Database Error:', error);
-    throw new Error('Failed to fetch interpreter data.');
-  }
-}
+
 
 
 export async function POST(request: Request) {

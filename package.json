@@ -12,6 +12,7 @@
     "@googlemaps/js-api-loader": "^1.16.8",
     "@types/bcrypt": "^5.0.2",
     "@types/jsonwebtoken": "^9.0.10",
+    "@vercel/postgres": "^0.10.0",
     "bcrypt": "^6.0.0",
     "bootstrap": "^5.3.6",
     "jose": "^6.0.11",

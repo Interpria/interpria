@@ -27,14 +27,29 @@ export async function fetchInterpreterxattractionByInterpreterId(interpreterId: 
   }
 }
 
+export async function GET(request: Request, { params }: { params: Promise<{ interpreterId: string }> }) {
+  try {
+    const { interpreterId } = await params;
+    const interpreterxattraction = await fetchInterpreterxattractionByInterpreterId(parseInt(interpreterId));
+    return NextResponse.json(interpreterxattraction);
+  } catch (error) {
+    console.error('Database Error:', error);
+    return NextResponse.json(
+      { message: 'Failed to fetch interpreterxattraction' },
+      { status: 500 }
+    );
+  }
+}
+
 export async function POST(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const body = await request.json();
     const { attraction_id, duration, buffer_time, max_traveler, price } = body;
-    const interpreter_id = parseInt(params.id);
+    const { id } = await params;
+    const interpreter_id = parseInt(id);
 
     // Validate required fields
     if (!attraction_id || duration === undefined) {

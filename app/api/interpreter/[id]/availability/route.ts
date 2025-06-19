@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import mysql from 'mysql2/promise';
+import { AvailabilityInterpreter } from '@/app/lib/definitions';
 
 const conn = await mysql.createConnection({
   host: process.env.MYSQL_HOST,
@@ -50,3 +51,35 @@ export async function POST(request: Request) {
     );
   }
 } 
+
+export async function fetchAvailabilityInterpreterByInterpreterId(id: number) {
+  try {
+    const [rows] = await conn.query(`
+      SELECT
+        ai.*,
+        a.attraction_id as attraction_id
+      FROM availability_interpreter ai
+      LEFT JOIN attraction a ON ai.attraction_id = a.attraction_id
+      WHERE ai.interpreter_id = ? 
+    `, [id]);
+    return rows as (AvailabilityInterpreter & { attraction_id: number })[];
+  }catch (error) {
+    console.error('Database Error:', error);
+    throw new Error('Failed to fetch interpreter data.');
+  }
+}
+
+export async function GET(request: Request, { params }: { params: Promise<{ id: string }> }) {
+  try {
+    const { id } = await params;
+    const interpreterId = parseInt(id);
+    const availability = await fetchAvailabilityInterpreterByInterpreterId(interpreterId);
+    return NextResponse.json(availability);
+  } catch (error) {
+    console.error('Database Error:', error);
+    return NextResponse.json(
+      { message: 'Failed to fetch availability' },
+      { status: 500 }
+    );
+  }
+}

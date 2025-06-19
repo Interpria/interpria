@@ -5,6 +5,20 @@
   --foreground: #171717;
   --light-background: #FFF3E0;
   --orange-deep: #f5a035;
+  --orange-medium: #fddeb5;
+}
+
+.button-view{
+  background-color: var(--orange-deep);
+  color: white;
+}
+
+.button-view:hover {
+  background-color: var(--orange-medium);
+}
+
+.button-view:active {
+  background-color: var(--orange-deep);
 }
 
 @theme inline {

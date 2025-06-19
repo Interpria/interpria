@@ -1,5 +1,6 @@
-import { fetchInterpreterById, fetchAvailabilityInterpreterByInterpreterId } from '@/app/api/interpreter/route';
-import { fetchInterpreterxattractionByInterpreterId } from '@/app/api/interpreterxattraction/[id]/route';
+import { fetchInterpreterById } from '@/app/api/interpreter/[id]/route';
+import { fetchAvailabilityInterpreterByInterpreterId } from '@/app/api/interpreter/[id]/availability/route';
+import { fetchInterpreterxattractionByInterpreterId } from '@/app/api/interpreterxattraction/interpreter/[interpreterId]/route';
 import Link from 'next/link';
 import { Interpreterxattraction } from '@/app/lib/definitions';
 import UpdateLanguagesButton from './UpdateLanguagesButton';
@@ -104,7 +105,7 @@ export default async function InterpreterDetailsPage({
                   </tr>
                   <tr>
                     <th>Phone Number:</th>
-                    <td>{interpreterUser[0].phone_num || 'Not provided'}</td>
+                    <td>{interpreterUser[0].phone || 'Not provided'}</td>
                   </tr>
                 </tbody>
               </table>

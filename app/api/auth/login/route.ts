@@ -1,7 +1,9 @@
-import { NextResponse } from 'next/server';
+import { NextResponse, NextRequest  } from 'next/server';
 import mysql from 'mysql2/promise';
 import bcrypt from 'bcrypt';
 import { createToken } from '@/lib/jwt';
+import { verifyToken } from '@/lib/jwt';      // implement this to verify your token
+import { cookies } from 'next/headers';       // for Next.js 13+ App Router
 
 const conn = await mysql.createConnection({
   host: process.env.MYSQL_HOST,
@@ -80,6 +82,30 @@ export async function POST(request: Request) {
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
+    );
+  }
+}
+
+export async function GET() {
+  try {
+    // 1) Read the httpOnly cookie
+    const cookieStore = await cookies();
+    const token = cookieStore.get('token')?.value;
+    if (!token) {
+      return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
+    }
+
+    // 2) Verify & decode
+    const payload = await verifyToken(token); // should throw if invalid
+    // e.g. payload = { userId: 123, email: "...", role: "user" }
+
+    // 3) Return the decoded data
+    return NextResponse.json({ user: payload });
+  } catch (err: any) {
+    console.error('GET /api/me error:', err);
+    return NextResponse.json(
+      { error: 'Forbidden' },
+      { status: 403 }
     );
   }
 }
