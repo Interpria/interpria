@@ -24,7 +24,7 @@ export default function AddAvailabilityButton({ interpreterId, attractionId, att
     e.preventDefault();
     
     try {
-      const response = await fetch('/api/interpreter/availability', {
+      const response = await fetch('/api/interpreter/[id]/availability', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

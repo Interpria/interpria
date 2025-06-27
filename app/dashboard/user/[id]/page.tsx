@@ -1,5 +1,5 @@
-import { fetchUserById } from '@/app/api/user/route';
-import { fetchBookingsByUserId } from '@/app/api/booking/route';
+import { fetchUserById } from '@/app/api/user/[id]/route';
+import { fetchBookingsByUserId } from '@/app/api/booking/user/[userId]/route';
 import Link from 'next/link';
 import CreateBookingForm from './CreateBookingForm';
 import DeleteBookingButton from './DeleteBookingButton';
@@ -55,7 +55,7 @@ export default async function UserDetailsPage({
                 </tr>
                 <tr>
                   <th>Phone Number:</th>
-                  <td>{user[0].phone_num}</td>
+                  <td>{user[0].phone}</td>
                 </tr>
                 <tr>
                   <th>Created At:</th>

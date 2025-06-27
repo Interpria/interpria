@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import mysql from 'mysql2/promise';
+import { Interpreterxlanguage } from '@/app/lib/definitions';
 
 const conn = await mysql.createConnection({
   host: process.env.MYSQL_HOST,
@@ -42,3 +43,46 @@ export async function PUT(
     );
   }
 } 
+
+export async function GET(
+  request: Request,
+  { params }: { params: { id: string } }
+) {
+  try {
+    const { id } = await params;
+    const interpreterId = parseInt(id);
+
+    if (isNaN(interpreterId)) {
+      return NextResponse.json({ error: 'Invalid interpreter ID' }, { status: 400 });
+    }
+
+    const [rows] = await conn.query(
+      `SELECT il.language_id, l.name
+       FROM interpreterxlanguage il
+       JOIN language l ON il.language_id = l.language_id
+       WHERE il.interpreter_id = ?`,
+      [interpreterId]
+    );
+
+    return NextResponse.json(rows);
+  } catch (error) {
+    console.error('Database Error:', error);
+    return NextResponse.json(
+      { message: 'Failed to fetch interpreter languages' },
+      { status: 500 }
+    );
+  }
+}
+
+export async function fetchInterpreterxlanguageByInterpreterId(interpreterId: number) {
+  try {
+    const [rows] = await conn.query(
+      'SELECT * FROM `interpreterxlanguage` WHERE interpreter_id = ?',
+      [interpreterId]
+    );
+    return rows as Interpreterxlanguage[];
+  } catch (error) {
+    console.error('Database Error:', error);
+    throw new Error('Failed to fetch interpreterxlanguage data.');
+  }
+}

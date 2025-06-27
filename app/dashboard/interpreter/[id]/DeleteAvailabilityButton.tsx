@@ -21,7 +21,7 @@ export default function DeleteAvailabilityButton({
 
   const handleDelete = async () => {
     try {
-      const response = await fetch(`/api/interpreter/availability/${availabilityId}`, {
+      const response = await fetch(`/api/interpreter/[id]/availability/${availabilityId}`, {
         method: 'DELETE',
       });
 

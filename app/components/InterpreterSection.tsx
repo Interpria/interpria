@@ -81,7 +81,13 @@ export default function InterpreterSection({ attractionId, attractionName }: Int
             <h3 className="text-lg font-medium mb-2">{interpreter.name}</h3>
             <div className="space-y-2">
               <p><span className="font-medium">Bio:</span> {interpreter.bio}</p>
-              <p><span className="font-medium">Languages:</span> {interpreter.primary_language},{interpreter.languages}</p>
+              <p>
+                <span className="font-medium">Languages:</span>{' '}
+                {interpreter.primary_language}
+                {interpreter.languages && interpreter.languages.trim() && (
+                  <>,{interpreter.languages}</>
+                )}
+              </p>
               <p><span className="font-medium">Tour Duration:</span> {interpreter.duration} minutes</p>
               <p><span className="font-medium">Max people:</span> {interpreter.max_traveler}</p>
               <p><span className="font-medium">Price:</span> ${interpreter.price}</p>

@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import mysql from 'mysql2/promise';
+import { Booking } from '@/app/lib/definitions';
 
 const conn = await mysql.createConnection({
   host: process.env.MYSQL_HOST,
@@ -9,55 +10,24 @@ const conn = await mysql.createConnection({
   port: process.env.MYSQL_PORT? parseInt(process.env.MYSQL_PORT) : 3306,
 })
 
-import { Booking } from '@/app/lib/definitions';
-
 export async function fetchBooking() {
   try {
     const [rows] = await conn.query(`
       SELECT 
         b.*,
-        t.name as traveler_name,
+        u.name as user_name,
         i.name as interpreter_name,
         a.name as attraction_name,
         l.name as language_name
       FROM booking b
-      LEFT JOIN user t ON b.traveler_id = t.user_id
+      LEFT JOIN user u ON b.user_id = u.user_id
       LEFT JOIN interpreter i2 ON b.interpreter_id = i2.interpreter_id
       LEFT JOIN user i ON i2.user_id = i.user_id
       LEFT JOIN attraction a ON b.attraction_id = a.attraction_id
       LEFT JOIN language l ON b.language_id = l.language_id
     `);
     return rows as (Booking & {
-      traveler_name: string;
-      interpreter_name: string;
-      attraction_name: string;
-      language_name: string;
-    })[];
-  }catch (error) {
-    console.error('Database Error:', error);
-    throw new Error('Failed to fetch booking data.');
-  }
-}
-
-export async function fetchBookingsByUserId(userId: number) {
-  try {
-    const [rows] = await conn.query(`
-      SELECT 
-        b.*,
-        t.name as traveler_name,
-        i.name as interpreter_name,
-        a.name as attraction_name,
-        l.name as language_name
-      FROM booking b
-      LEFT JOIN user t ON b.traveler_id = t.user_id
-      LEFT JOIN interpreter i2 ON b.interpreter_id = i2.interpreter_id
-      LEFT JOIN user i ON i2.user_id = i.user_id
-      LEFT JOIN attraction a ON b.attraction_id = a.attraction_id
-      LEFT JOIN language l ON b.language_id = l.language_id
-      WHERE b.traveler_id = ? OR i2.user_id = ?
-    `, [userId, userId]);
-    return rows as (Booking & {
-      traveler_name: string;
+      user_name: string;
       interpreter_name: string;
       attraction_name: string;
       language_name: string;
@@ -72,7 +42,7 @@ export async function POST(request: Request) {
   try {
     const body = await request.json();
     const { 
-      traveler_id, 
+      user_id, 
       interpreter_id, 
       attraction_id, 
       language_id,
@@ -84,7 +54,7 @@ export async function POST(request: Request) {
     } = body;
 
     // Validate required fields
-    if (!traveler_id || !interpreter_id || !attraction_id || !language_id || !start_time || !end_time || !num_people) {
+    if (!user_id || !interpreter_id || !attraction_id || !language_id || !start_time || !end_time || !num_people) {
       return NextResponse.json(
         { error: 'Missing required fields' },
         { status: 400 }
@@ -117,7 +87,7 @@ export async function POST(request: Request) {
     // Create the booking
     const [result] = await conn.query(`
       INSERT INTO booking (
-        traveler_id, 
+        user_id, 
         interpreter_id, 
         attraction_id, 
         language_id,
@@ -128,7 +98,7 @@ export async function POST(request: Request) {
         status
       ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
     `, [
-      traveler_id,
+      user_id,
       interpreter_id,
       attraction_id,
       language_id,

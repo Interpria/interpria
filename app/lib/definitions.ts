@@ -93,7 +93,7 @@ export type AvailabilityInterpreter = {
 
 export type Booking = {
   booking_id: number;
-  traveler_id: number;
+  user_id: number;
   interpreter_id: number;
   attraction_id: number;
   start_time: string;

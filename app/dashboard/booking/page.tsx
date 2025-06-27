@@ -17,7 +17,7 @@ export default async function BookingPage() {
           <thead>
             <tr>
               <th scope="col">ID</th>
-              <th scope="col">Traveler</th>
+              <th scope="col">User</th>
               <th scope="col">Interpreter</th>
               <th scope="col">Attraction</th>
               <th scope="col">Start Time</th>
@@ -32,7 +32,7 @@ export default async function BookingPage() {
             {bookings.map((booking) => (
               <tr key={booking.booking_id}>
                 <th scope="row">{booking.booking_id}</th>
-                <td>{booking.traveler_name}</td>
+                <td>{booking.user_name}</td>
                 <td>{booking.interpreter_name}</td>
                 <td>{booking.attraction_name}</td>
                 <td>{formatDateTime(booking.start_time)}</td>

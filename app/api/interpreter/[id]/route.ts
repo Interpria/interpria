@@ -10,7 +10,7 @@ const conn = await mysql.createConnection({
   port: process.env.MYSQL_PORT? parseInt(process.env.MYSQL_PORT) : 3306,
 });
 
-export async function GET(request: Request, { params }: { params: Promise<{ id: string }> }) {
+export async function GET(request: Request, { params }: { params: { id: string } }) {
   try {
     const { id } = await params;
     if (!id) {
@@ -25,6 +25,62 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
     console.error('Database Error:', error);
     return NextResponse.json(
       { message: 'Failed to fetch interpreters' },
+      { status: 500 }
+    );
+  }
+}
+
+export async function PUT(
+  request: Request,
+  { params }: { params: { id: string } }
+) {
+  try {
+    const { id } = await params;
+    if (!id) {
+      return NextResponse.json(
+        { message: 'ID parameter is required' },
+        { status: 400 }
+      );
+    }
+
+    const data = await request.json();
+    const {
+      bio,
+      introduction,
+      primary_language_id
+    } = data;
+
+    // Update interpreter and user tables
+    const [result] = await conn.query(
+      `
+      UPDATE interpreter i
+      SET 
+        i.bio = ?,
+        i.introduction = ?,
+        i.primary_language_id = ?
+      WHERE i.interpreter_id = ?
+      `,
+      [
+        bio,
+        introduction,
+        primary_language_id,
+        parseInt(id)
+      ]
+    );
+
+    if ((result as any).affectedRows === 0) {
+      return NextResponse.json(
+        { message: 'Interpreter not found or no changes made' },
+        { status: 404 }
+      );
+    }
+
+    const updatedInterpreter = await fetchInterpreterById(parseInt(id));
+    return NextResponse.json(updatedInterpreter[0] || {});
+  } catch (error) {
+    console.error('Database Error:', error);
+    return NextResponse.json(
+      { message: 'Failed to update interpreter' },
       { status: 500 }
     );
   }

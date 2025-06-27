@@ -33,22 +33,7 @@ export async function fetchUser() {
   }
 }
 
-export async function fetchUserById(id: number) {
-  try {
-    const [rows] = await conn.query(`
-      SELECT
-        u.*,
-        i.interpreter_id
-      FROM user u
-      LEFT JOIN interpreter i ON u.user_id = i.user_id
-      WHERE u.user_id = ?
-    `, [id]);
-    return rows as (User & { interpreter_id: number })[];
-  } catch (error) {
-    console.error('Database Error:', error);
-    throw new Error('Failed to fetch user data.');
-  }
-}
+
 
 export async function POST(request: Request) {
   try {

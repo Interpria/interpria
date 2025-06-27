@@ -19,15 +19,7 @@ export async function fetchAttraction() {
   }
 }
 
-export async function fetchAttractionById(id: number) {
-  try {
-    const [rows] = await conn.query('SELECT * FROM `attraction` WHERE `attraction_id` = ?', [id]);
-    return rows as Attraction[];
-  }catch (error) {
-    console.error('Database Error:', error);
-    throw new Error('Failed to fetch attraction data.');
-  }
-}
+
 
 export async function fetchAvailabilityAttraction() {
   try {
