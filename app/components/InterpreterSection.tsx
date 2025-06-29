@@ -14,6 +14,7 @@ interface InterpreterWithDetails extends Interpreterxattraction {
   bio: string;
   languages: string;
   primary_language: string;
+  rating: number | null;
 }
 
 export default function InterpreterSection({ attractionId, attractionName }: InterpreterSectionProps) {
@@ -78,7 +79,15 @@ export default function InterpreterSection({ attractionId, attractionName }: Int
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {interpreters.map((interpreter) => (
           <div key={interpreter.interpreterxattraction_id} className="border rounded-lg p-4 hover:shadow-lg transition-shadow">
-            <h3 className="text-lg font-medium mb-2">{interpreter.name}</h3>
+            <div className="flex items-center justify-between mb-2">
+              <h3 className="text-lg font-medium mb-0">{interpreter.name}</h3>
+              {interpreter.rating ? (
+                <span className="flex items-center">
+                  <i className="bi bi-star-fill" style={{ fontSize: 24, color: 'var(--orange-deep)' }}></i>
+                  <span className="ml-1 text-lg font-semibold">{interpreter.rating}</span>
+                </span>
+              ) : null}
+            </div>
             <div className="space-y-2">
               <p><span className="font-medium">Bio:</span> {interpreter.bio}</p>
               <p>
@@ -91,12 +100,11 @@ export default function InterpreterSection({ attractionId, attractionName }: Int
               <p><span className="font-medium">Tour Duration:</span> {interpreter.duration} minutes</p>
               <p><span className="font-medium">Max people:</span> {interpreter.max_traveler}</p>
               <p><span className="font-medium">Price:</span> ${interpreter.price}</p>
-              {/* <p><span className="font-medium">Rating:</span> {interpreter.rating}</p> */}
               <button 
                 className="mt-2 w-full bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 transition-colors"
                 onClick={() => {
                   // Handle booking or more details
-                  router.push(`/interpreter/${interpreter.interpreter_id}`);
+                  router.push(`/interpreter/${interpreter.interpreter_id}?attractionId=${attractionId}`);
                 }}
               >
                 Check Availability

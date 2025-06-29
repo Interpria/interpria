@@ -7,8 +7,8 @@ export default function BookingForm({ interpreterId, attractionId }: { interpret
   const router = useRouter();
   const [languages, setLanguages] = useState<any[]>([]);
   const [selectedLanguage, setSelectedLanguage] = useState<number | ''>('');
-  const [interpreterName, setInterpreterName] = useState<string>(''); // Add this line
-  const [attractionName, setAttractionName] = useState<string>(''); // Add this line
+  const [interpreterName, setInterpreterName] = useState<string>('');
+  const [attractionName, setAttractionName] = useState<string>('');
   const [formData, setFormData] = useState({
     start_time: '',
     end_time: '',
@@ -17,7 +17,7 @@ export default function BookingForm({ interpreterId, attractionId }: { interpret
   });
   const [error, setError] = useState<string | null>(null);
   const [userId, setUserId] = useState<number | null>(null);
-  const [interpreterLanguages, setInterpreterLanguages] = useState<number[]>([]); // language_id array
+  const [interpreterLanguages, setInterpreterLanguages] = useState<number[]>([]);
   const [interpretAttraction, setInterpretAttraction] = useState<any>(null);
   const [price, setPrice] = useState<number | null>(null);
 
@@ -150,7 +150,7 @@ export default function BookingForm({ interpreterId, attractionId }: { interpret
         price: '',
       });
       setError(null);
-      router.refresh();
+      router.push('/profile/user/booking');
     } catch (error) {
       console.error('Error creating booking:', error);
       setError('Failed to create booking. Please try again.');

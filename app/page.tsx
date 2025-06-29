@@ -19,6 +19,13 @@ export default function Home() {
       const data: Attraction = JSON.parse(detail);
       setSelectedAttraction(data);
       setShowInterpreters(true);
+      // Scroll to InterpreterSection after showing it
+      setTimeout(() => {
+        const section = document.getElementById('interpreter-section');
+        if (section) {
+          section.scrollIntoView({ behavior: 'smooth' });
+        }
+      }, 100); // Wait for render
     } catch (err) {
       console.error('Failed to parse attraction detail:', err);
     }
@@ -140,10 +147,12 @@ export default function Home() {
 
         {showInterpreters && selectedAttraction && (
           <>
-            <InterpreterSection
-              attractionId={selectedAttraction.attraction_id}
-              attractionName={selectedAttraction.name}
-            />
+            <div id="interpreter-section">
+              <InterpreterSection
+                attractionId={selectedAttraction.attraction_id}
+                attractionName={selectedAttraction.name}
+              />
+            </div>
           </>
         )}
       </div>

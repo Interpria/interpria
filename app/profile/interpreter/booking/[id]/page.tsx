@@ -40,9 +40,9 @@ export default function BookingDetailsPage() {
       <div className="mb-3 d-flex gap-2">
         <button
           className="btn btn-secondary"
-          onClick={() => router.push('/profile/user/booking')}
+          onClick={() => router.push('/profile/interpreter/booking')}
         >
-          ← Back to User Bookings
+          ← Back to Interpreter Bookings
         </button>
       </div>
       <h1 className='mb-4'>Booking Details</h1>

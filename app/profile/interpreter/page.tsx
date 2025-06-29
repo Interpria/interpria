@@ -17,6 +17,7 @@ interface InterpreterData {
   phone?: string;
   languages: string;
   primary_language: string;
+  rating: number | null;
 }
 
 export default function InterpreterViewPage() {
@@ -96,6 +97,10 @@ export default function InterpreterViewPage() {
             <div className='col-md-6'>
               <table className='table'>
                 <tbody>
+                  <tr>
+                    <th>Rating:</th>
+                    <td>{interpreterUser.rating ? interpreterUser.rating : 'No rating yet'}</td>
+                  </tr>
                   <tr>
                     <th>Gender:</th>
                     <td>{interpreterUser.gender}</td>

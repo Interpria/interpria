@@ -9,6 +9,11 @@ export default function ProfilePage() {
   const [phone, setPhone] = useState('');
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [showReset, setShowReset] = useState(false);
+  const [resetPassword, setResetPassword] = useState("");
+  const [resetConfirm, setResetConfirm] = useState("");
+  const [resetError, setResetError] = useState("");
+  const [resetSuccess, setResetSuccess] = useState("");
 
   useEffect(() => {
     const fetchCurrentUser = async () => {
@@ -65,6 +70,30 @@ export default function ProfilePage() {
       setError('Failed to update phone number');
     } finally {
       setSaving(false);
+    }
+  };
+
+  const handleResetPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setResetError("");
+    setResetSuccess("");
+    if (resetPassword !== resetConfirm) {
+      setResetError("Passwords do not match");
+      return;
+    }
+    try {
+      const res = await fetch(`/api/auth/reset-password`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ password: resetPassword }),
+      });
+      if (!res.ok) throw new Error("Failed to reset password");
+      setResetSuccess("Password updated successfully.");
+      setShowReset(false);
+      setResetPassword("");
+      setResetConfirm("");
+    } catch (err) {
+      setResetError("Failed to reset password");
     }
   };
 
@@ -128,15 +157,52 @@ export default function ProfilePage() {
                   </td>
                 </tr>
                 <tr>
-                  <th>Interpreter ID:</th>
+                  <th>Interpreter:</th>
                   <td>
                     {user.interpreter_id ? (
-                      <Link href={`/dashboard/interpreter/${user.interpreter_id}`}>{user.interpreter_id}</Link>
+                      <Link href={`/profile/interpreter`}>Go to Interpreter's profile</Link>
                     ) : (
                       'Not registered as interpreter'
                     )}
                   </td>
                 </tr>
+                <tr>
+                  <th>Password:</th>
+                  <td>
+                    <button className="btn btn-outline-primary btn-sm" onClick={() => setShowReset(v => !v)}>
+                      {showReset ? "Cancel" : "Change Password"}
+                    </button>
+                  </td>
+                </tr>
+                {showReset && (
+                  <tr>
+                    <td colSpan={2}>
+                      <form onSubmit={handleResetPassword} className="mb-2">
+                        <div className="mb-2">
+                          <input
+                            type="password"
+                            placeholder="New password"
+                            className="form-control mb-1"
+                            value={resetPassword}
+                            onChange={e => setResetPassword(e.target.value)}
+                            required
+                          />
+                          <input
+                            type="password"
+                            placeholder="Confirm new password"
+                            className="form-control"
+                            value={resetConfirm}
+                            onChange={e => setResetConfirm(e.target.value)}
+                            required
+                          />
+                        </div>
+                        <button type="submit" className="btn btn-success btn-sm">Update Password</button>
+                        {resetError && <div className="text-danger mt-1">{resetError}</div>}
+                        {resetSuccess && <div className="text-success mt-1">{resetSuccess}</div>}
+                      </form>
+                    </td>
+                  </tr>
+                )}
               </tbody>
             </table>
           </div>

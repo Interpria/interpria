@@ -9,11 +9,11 @@ export default function InterpreterBookingPage() {
   const [bookings, setBookings] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [confirmingId, setConfirmingId] = useState<number | null>(null);
 
   const formatDateTime = (dateTimeStr: string) => {
     const date = new Date(dateTimeStr);
-    return date.toLocaleString();
+    // Format: YYYY-MM-DD HH:mm
+    return `${date.getFullYear()}-${(date.getMonth()+1).toString().padStart(2,'0')}-${date.getDate().toString().padStart(2,'0')} ${date.getHours().toString().padStart(2,'0')}:${date.getMinutes().toString().padStart(2,'0')}`;
   };
 
   useEffect(() => {
@@ -65,7 +65,6 @@ export default function InterpreterBookingPage() {
   }, [interpreter]);
 
   const handleConfirm = async (bookingId: number) => {
-    setConfirmingId(bookingId);
     try {
       const res = await fetch(`/api/booking/${bookingId}`, {
         method: 'PATCH',
@@ -82,8 +81,21 @@ export default function InterpreterBookingPage() {
       }
     } catch (err) {
       // Optionally show error
-    } finally {
-      setConfirmingId(null);
+    }
+  };
+
+  const handleCancelBooking = async (bookingId: number) => {
+    try {
+      const res = await fetch(`/api/booking/${bookingId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: 'cancelled' }),
+      });
+      if (res.ok) {
+        setBookings((prev) => prev.map(b => b.booking_id === bookingId ? { ...b, status: 'cancelled' } : b));
+      }
+    } catch (err) {
+      // Optionally show error
     }
   };
 
@@ -94,17 +106,23 @@ export default function InterpreterBookingPage() {
   const now = new Date();
   const pendingBookings = bookings.filter((b) => b.status === 'pending');
   const upcomingBookings = bookings.filter(
-    (b) => b.status !== 'pending' && new Date(b.start_time) >= now
+    (b) => b.status === 'confirmed' && new Date(b.start_time) >= now
   );
   const pastBookings = bookings.filter(
-    (b) => b.status !== 'pending' && new Date(b.start_time) < now
+    (b) => b.status === 'confirmed' && new Date(b.start_time) < now
   );
+  const cancelledBookings = bookings.filter((b) => b.status === 'cancelled');
 
-  const BookingCard = ({ booking, showConfirm }: { booking: any; showConfirm?: boolean }) => (
+  const BookingCard = ({ booking, showConfirm, showCancel }: { booking: any; showConfirm?: boolean; showCancel?: boolean }) => (
     <div className="col-md-4 mb-3">
       <div className="card h-100">
         <div className="card-body">
-          <h5 className="card-title">{booking.attraction_name}</h5>
+          <div className="d-flex justify-content-between align-items-center mb-2">
+            <h5 className="card-title mb-0">{booking.attraction_name}</h5>
+            <Link href={`/profile/interpreter/booking/${booking.booking_id}`} className="btn btn-outline-primary btn-sm ms-2">
+              Detail
+            </Link>
+          </div>
           <h6 className="card-subtitle mb-2 text-muted">
             Participant: {booking.user_name}
           </h6>
@@ -116,11 +134,15 @@ export default function InterpreterBookingPage() {
           </div>
           {showConfirm && (
             <button
-              className="btn btn-success mt-3"
-              disabled={confirmingId === booking.booking_id}
+              className="btn btn-success btn-sm mt-2 me-2"
               onClick={() => handleConfirm(booking.booking_id)}
             >
-              {confirmingId === booking.booking_id ? 'Confirming...' : 'Confirm'}
+              Accept
+            </button>
+          )}
+          {showCancel && (
+            <button className="btn btn-danger btn-sm mt-2" onClick={() => handleCancelBooking(booking.booking_id)}>
+              Cancel
             </button>
           )}
         </div>
@@ -146,7 +168,7 @@ export default function InterpreterBookingPage() {
           <div className="row">
             {pendingBookings.length > 0 ? (
               pendingBookings.map((booking) => (
-                <BookingCard booking={booking} key={booking.booking_id} showConfirm />
+                <BookingCard booking={booking} key={booking.booking_id} showConfirm showCancel />
               ))
             ) : (
               <div className="col-12">
@@ -164,13 +186,7 @@ export default function InterpreterBookingPage() {
           <div className="row">
             {upcomingBookings.length > 0 ? (
               upcomingBookings.map((booking) => (
-                <Link
-                  href={`/profile/booking/${booking.booking_id}`}
-                  className="text-decoration-none text-dark"
-                  style={{ display: 'flex' }}
-                >
-                  <BookingCard booking={booking} key={booking.booking_id} />
-                </Link>
+                <BookingCard booking={booking} key={booking.booking_id} showCancel />
               ))
             ) : (
               <div className="col-12">
@@ -180,7 +196,7 @@ export default function InterpreterBookingPage() {
           </div>
         </div>
         {/* Past Bookings Section */}
-        <div>
+        <div className="mb-5">
           <h3 className="mb-0">Past Bookings</h3>
           <span className="badge bg-secondary mb-2">
             {pastBookings.length} Booking{pastBookings.length !== 1 ? 's' : ''}
@@ -197,6 +213,22 @@ export default function InterpreterBookingPage() {
             )}
           </div>
         </div>
+        <div className="mb-5">
+          <h3 className="mb-0">Cancelled Bookings</h3>
+          <span className="badge bg-danger mb-2">
+            {cancelledBookings.length} Booking{cancelledBookings.length !== 1 ? 's' : ''}
+          </span>
+          <div className="row">
+            {cancelledBookings.length > 0 ? (
+              cancelledBookings.map((booking) => (
+                <BookingCard key={booking.booking_id} booking={booking} />
+              ))
+            ) : (
+              <p className="text-muted mb-0">No cancelled bookings found</p>
+            )}
+          </div>
+        </div>
+
       </div>
     </div>
   );

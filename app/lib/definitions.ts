@@ -16,6 +16,7 @@ export type Interpreter = {
   bio: string;
   introduction: string;
   primary_language_id: number;
+  rating: number|null;
   created_at: Date;
   updated_at: Date;
 };
@@ -101,7 +102,8 @@ export type Booking = {
   language_id: number;
   num_people: number;
   price: number;
-  status: 'pending' | 'confirmed' | 'cancelled' | 'completed';
+  status: 'pending' | 'confirmed' | 'cancelled' | 'rated';
+  rating: number | null;
   created_at: Date;
   updated_at: Date;
 };

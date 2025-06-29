@@ -96,7 +96,7 @@ export default function CreateInterpreterPage() {
         throw new Error(data.message || 'Failed to create interpreter');
       }
 
-      router.push('/interpreter');
+      router.push('/profile/interpreter');
       router.refresh();
     } catch (error) {
       setError(error instanceof Error ? error.message : 'An error occurred');

@@ -6,10 +6,16 @@ export default function UserBookingPage() {
   const [user, setUser] = useState<any>(null);
   const [bookings, setBookings] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [ratingModal, setRatingModal] = useState<{ open: boolean, bookingId: number | null }>({ open: false, bookingId: null });
+  const [ratingValue, setRatingValue] = useState<number>(5);
+  const [ratingLoading, setRatingLoading] = useState(false);
+  const [ratingError, setRatingError] = useState<string | null>(null);
+  const [ratingSuccess, setRatingSuccess] = useState<string | null>(null);
 
   const formatDateTime = (dateTimeStr: string) => {
     const date = new Date(dateTimeStr);
-    return date.toLocaleString();
+    // Format: YYYY-MM-DD HH:mm
+    return `${date.getFullYear()}-${(date.getMonth()+1).toString().padStart(2,'0')}-${date.getDate().toString().padStart(2,'0')} ${date.getHours().toString().padStart(2,'0')}:${date.getMinutes().toString().padStart(2,'0')}`;
   };
 
   useEffect(() => {
@@ -57,6 +63,50 @@ export default function UserBookingPage() {
     fetchBookings();
   }, [user]);
 
+  const handleCancelBooking = async (bookingId: number) => {
+    try {
+      const res = await fetch(`/api/booking/${bookingId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: 'cancelled' }),
+      });
+      if (res.ok) {
+        setBookings((prev) => prev.map(b => b.booking_id === bookingId ? { ...b, status: 'cancelled' } : b));
+      }
+    } catch (err) {
+      // Optionally show error
+    }
+  };
+
+  const handleOpenRating = (bookingId: number) => {
+    setRatingModal({ open: true, bookingId });
+    setRatingValue(5);
+    setRatingError(null);
+    setRatingSuccess(null);
+  };
+
+  const handleSubmitRating = async () => {
+    if (!ratingModal.bookingId) return;
+    setRatingLoading(true);
+    setRatingError(null);
+    setRatingSuccess(null);
+    try {
+      const res = await fetch(`/api/booking/${ratingModal.bookingId}/rate`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ rating: ratingValue }),
+      });
+      if (!res.ok) throw new Error('Failed to submit rating');
+      setRatingSuccess('Thank you for your rating!');
+      setBookings((prev) => prev.map(b => b.booking_id === ratingModal.bookingId ? { ...b, rated: true } : b));
+      setTimeout(() => setRatingModal({ open: false, bookingId: null }), 1200);
+    } catch (err) {
+      setRatingError('Failed to submit rating');
+    } finally {
+      setRatingLoading(false);
+    }
+  };
+
   if (loading) return <div className="container py-5">Loading...</div>;
   if (!user) return <div className="container py-5">User not found.</div>;
 
@@ -64,17 +114,23 @@ export default function UserBookingPage() {
   const now = new Date();
   const pendingBookings = bookings.filter((b) => b.status === 'pending');
   const upcomingBookings = bookings.filter(
-    (b) => b.status !== 'pending' && new Date(b.start_time) >= now
+    (b) => b.status === 'confirmed' && new Date(b.start_time) >= now
   );
   const pastBookings = bookings.filter(
-    (b) => b.status !== 'pending' && new Date(b.start_time) < now
+    (b) => b.status === 'confirmed' && new Date(b.start_time) < now
   );
+  const cancelledBookings = bookings.filter((b) => b.status === 'cancelled');
 
-  const BookingCard = ({ booking }: { booking: any }) => (
+  const BookingCard = ({ booking, showCancel, showRate }: { booking: any, showCancel?: boolean, showRate?: boolean }) => (
     <div className="col-md-4 mb-3">
       <div className="card h-100">
         <div className="card-body">
-          <h5 className="card-title">{booking.attraction_name}</h5>
+          <div className="d-flex justify-content-between align-items-center mb-2">
+            <h5 className="card-title mb-0">{booking.attraction_name}</h5>
+            <Link href={`/profile/user/booking/${booking.booking_id}`} className="btn btn-outline-primary btn-sm ms-2">
+              Detail
+            </Link>
+          </div>
           <h6 className="card-subtitle mb-2 text-muted">
             Interpreter: {booking.interpreter_name}
           </h6>
@@ -84,7 +140,19 @@ export default function UserBookingPage() {
           <div>
             <strong>End:</strong> {formatDateTime(booking.end_time)}
           </div>
-          {/* Add more booking details or actions here if needed */}
+          {showCancel && (
+            <button className="btn btn-danger btn-sm mt-2" onClick={() => handleCancelBooking(booking.booking_id)}>
+              Cancel
+            </button>
+          )}
+          {showRate && !booking.rated && (
+            <button className="btn btn-warning btn-sm mt-2 ms-2" onClick={() => handleOpenRating(booking.booking_id)}>
+              Rate
+            </button>
+          )}
+          {showRate && booking.rated && (
+            <span className="badge bg-success mt-2 ms-2">Rated</span>
+          )}
         </div>
       </div>
     </div>
@@ -107,7 +175,7 @@ export default function UserBookingPage() {
           <div className="row">
             {pendingBookings.length > 0 ? (
               pendingBookings.map((booking) => (
-                <BookingCard key={booking.booking_id} booking={booking} />
+                <BookingCard key={booking.booking_id} booking={booking} showCancel />
               ))
             ) : (
               <p className="text-muted mb-0">No pending bookings found</p>
@@ -128,7 +196,7 @@ export default function UserBookingPage() {
                   className="text-decoration-none text-dark"
                   key={booking.booking_id}
                 >
-                  <BookingCard booking={booking} />
+                  <BookingCard booking={booking} showCancel />
                 </Link>
               ))
             ) : (
@@ -136,7 +204,7 @@ export default function UserBookingPage() {
             )}
           </div>
         </div>
-        
+
         <div className="mb-5">
           <h3 className="mb-0">Past Bookings</h3>
           <span className="badge bg-secondary mb-2">
@@ -145,14 +213,64 @@ export default function UserBookingPage() {
           <div className="row">
             {pastBookings.length > 0 ? (
               pastBookings.map((booking) => (
-                <BookingCard key={booking.booking_id} booking={booking} />
+                <BookingCard key={booking.booking_id} booking={booking} showRate />
               ))
             ) : (
               <p className="text-muted mb-0">No past bookings found</p>
             )}
           </div>
         </div>
+
+        <div className="mb-5">
+          <h3 className="mb-0">Cancelled Bookings</h3>
+          <span className="badge bg-danger mb-2">
+            {cancelledBookings.length} Booking{cancelledBookings.length !== 1 ? 's' : ''}
+          </span>
+          <div className="row">
+            {cancelledBookings.length > 0 ? (
+              cancelledBookings.map((booking) => (
+                <BookingCard key={booking.booking_id} booking={booking} />
+              ))
+            ) : (
+              <p className="text-muted mb-0">No cancelled bookings found</p>
+            )}
+          </div>
+        </div>
+
       </div>
+
+      {/* Rating Modal */}
+      {ratingModal.open && (
+        <div className="modal fade show d-block" tabIndex={-1} style={{ background: 'rgba(0,0,0,0.3)' }}>
+          <div className="modal-dialog modal-dialog-centered">
+            <div className="modal-content">
+              <div className="modal-header">
+                <h5 className="modal-title">Rate Your Interpreter</h5>
+                <button type="button" className="btn-close" onClick={() => setRatingModal({ open: false, bookingId: null })}></button>
+              </div>
+              <div className="modal-body">
+                <label htmlFor="rating" className="form-label">Rating (1-5):</label>
+                <input
+                  id="rating"
+                  type="number"
+                  min={1}
+                  max={5}
+                  value={ratingValue}
+                  onChange={e => setRatingValue(Number(e.target.value))}
+                  className="form-control mb-2"
+                  disabled={ratingLoading}
+                />
+                {ratingError && <div className="text-danger mb-2">{ratingError}</div>}
+                {ratingSuccess && <div className="text-success mb-2">{ratingSuccess}</div>}
+              </div>
+              <div className="modal-footer">
+                <button type="button" className="btn btn-secondary" onClick={() => setRatingModal({ open: false, bookingId: null })} disabled={ratingLoading}>Close</button>
+                <button type="button" className="btn btn-primary" onClick={handleSubmitRating} disabled={ratingLoading}>Submit</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

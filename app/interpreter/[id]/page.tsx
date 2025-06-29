@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Interpreterxattraction } from '@/app/lib/definitions';
 import BookingForm from '@/app/components/bookingForm';
+import { useSearchParams } from 'next/navigation';
 
 const weekdays = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
@@ -21,6 +22,7 @@ interface InterpreterData {
   phone?: string;
   languages: string;
   primary_language: string;
+  rating: number | null;
 }
 
 interface AvailabilityData {
@@ -42,6 +44,8 @@ export default function InterpreterViewPage({
   const [availabilityInterpreter, setAvailabilityInterpreter] = useState<AvailabilityData[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const searchParams = useSearchParams();
+  const attractionId = searchParams.get('attractionId');
 
   useEffect(() => {
     const fetchData = async () => {
@@ -127,7 +131,13 @@ export default function InterpreterViewPage({
       <div className='card'>
         <div className='card-header'>
           <h1 className='card-title mb-0'>{interpreterUser[0].name}</h1>
-        </div>
+            {interpreterUser[0].rating ? (
+              <span className="flex items-center">
+                <i className="bi bi-star-fill" style={{ fontSize: 24, color: 'var(--orange-deep)' }}></i>
+                <span className="ml-1 text-lg font-semibold">{interpreterUser[0].rating}</span>
+              </span>
+            ) : null}
+        </div>               
         <div className='card-body mt-2'>
           <div className='row'>
             <div className='col-md-6'>
@@ -149,10 +159,6 @@ export default function InterpreterViewPage({
                     <th>Email:</th>
                     <td>{interpreterUser[0].email}</td>
                   </tr> 
-                  {/* <tr>
-                    <th>Phone:</th>
-                    <td>{interpreterUser[0].phone}</td>
-                  </tr> */}
                 </tbody>
               </table>
             </div>
@@ -228,7 +234,12 @@ export default function InterpreterViewPage({
                 </div>
               )}
 
-              <BookingForm interpreterId={interpreterUser[0].interpreter_id} attractionId={interpreterxattraction[0].attraction_id} />
+              {attractionId && (
+                <BookingForm
+                  interpreterId={interpreterUser[0].interpreter_id}
+                  attractionId={parseInt(attractionId, 10)}
+                />
+              )}
 
             </div>
           </div>
@@ -236,4 +247,4 @@ export default function InterpreterViewPage({
       </div>
     </div>
   );
-} 
+}

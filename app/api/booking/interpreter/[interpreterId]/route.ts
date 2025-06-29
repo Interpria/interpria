@@ -40,7 +40,7 @@ export async function fetchBookingsByInterpreterId(interpreterId: number) {
 }
 
 export async function GET(request: Request, { params }: { params: { interpreterId: string } }) {
-  const { interpreterId } = params;
+  const { interpreterId } = await params;
   if (!interpreterId) {
     return NextResponse.json({ error: 'Interpreter ID parameter is required' }, { status: 400 });
   }
