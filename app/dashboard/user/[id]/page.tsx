@@ -77,7 +77,7 @@ export default async function UserDetailsPage({
         <div className='row mt-4'>
           <div className='col-12'>
             <div className='d-flex justify-content-between align-items-center mb-3'>
-              <h3 className='mb-0'>Bookings</h3>
+              <h3 className='mb-0'>User Bookings</h3>
               <span className='badge bg-primary'>{bookings.length} Bookings</span>
             </div>
 
@@ -93,6 +93,7 @@ export default async function UserDetailsPage({
                     <th scope="col">People</th>
                     <th scope="col">Price</th>
                     <th scope="col">Status</th>
+                    <th scope="col">Rating</th>
                     <th scope="col">Actions</th>
                   </tr>
                 </thead>
@@ -107,6 +108,7 @@ export default async function UserDetailsPage({
                       <td>{booking.num_people}</td>
                       <td>{booking.price}</td>
                       <td>{booking.status}</td>
+                      <td>{booking.rating !== null ? booking.rating : 'Not rated'}</td>
                       <td>
                         <DeleteBookingButton bookingId={booking.booking_id} />
                       </td>
