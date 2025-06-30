@@ -98,7 +98,7 @@ export default function UserBookingPage() {
       });
       if (!res.ok) throw new Error('Failed to submit rating');
       setRatingSuccess('Thank you for your rating!');
-      setBookings((prev) => prev.map(b => b.booking_id === ratingModal.bookingId ? { ...b, rated: true } : b));
+      setBookings((prev) => prev.map(b => b.booking_id === ratingModal.bookingId ? { ...b, rated: true, rating: ratingValue } : b));
       setTimeout(() => setRatingModal({ open: false, bookingId: null }), 1200);
     } catch (err) {
       setRatingError('Failed to submit rating');
@@ -117,7 +117,7 @@ export default function UserBookingPage() {
     (b) => b.status === 'confirmed' && new Date(b.start_time) >= now
   );
   const pastBookings = bookings.filter(
-    (b) => b.status === 'confirmed' && new Date(b.start_time) < now
+    (b) => (b.status === 'confirmed' || b.status === 'rated') && new Date(b.start_time) < now
   );
   const cancelledBookings = bookings.filter((b) => b.status === 'cancelled');
 
@@ -145,13 +145,13 @@ export default function UserBookingPage() {
               Cancel
             </button>
           )}
-          {showRate && !booking.rated && (
+          {showRate && booking.rating == null && (
             <button className="btn btn-warning btn-sm mt-2 ms-2" onClick={() => handleOpenRating(booking.booking_id)}>
               Rate
             </button>
           )}
-          {showRate && booking.rated && (
-            <span className="badge bg-success mt-2 ms-2">Rated</span>
+          {showRate && booking.rating != null && (
+            <span className="badge bg-info mt-2 ms-2">Rated {booking.rating ?? ratingValue}</span>
           )}
         </div>
       </div>

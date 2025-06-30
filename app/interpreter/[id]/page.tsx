@@ -129,14 +129,14 @@ export default function InterpreterViewPage({
   return (
     <div className='container py-5'>
       <div className='card'>
-        <div className='card-header'>
+        <div className='card-header d-flex justify-content-between align-items-center'>
           <h1 className='card-title mb-0'>{interpreterUser[0].name}</h1>
-            {interpreterUser[0].rating ? (
-              <span className="flex items-center">
-                <i className="bi bi-star-fill" style={{ fontSize: 24, color: 'var(--orange-deep)' }}></i>
-                <span className="ml-1 text-lg font-semibold">{interpreterUser[0].rating}</span>
-              </span>
-            ) : null}
+          {interpreterUser[0].rating ? (
+            <span className="d-flex align-items-center ms-3">
+              <i className="bi bi-star-fill" style={{ fontSize: 24, color: 'var(--orange-deep)' }}></i>
+              <span className="ms-1 text-lg fw-semibold">{interpreterUser[0].rating}</span>
+            </span>
+          ) : null}
         </div>               
         <div className='card-body mt-2'>
           <div className='row'>

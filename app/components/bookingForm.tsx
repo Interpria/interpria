@@ -20,6 +20,7 @@ export default function BookingForm({ interpreterId, attractionId }: { interpret
   const [interpreterLanguages, setInterpreterLanguages] = useState<number[]>([]);
   const [interpretAttraction, setInterpretAttraction] = useState<any>(null);
   const [price, setPrice] = useState<number | null>(null);
+  const [showSuccess, setShowSuccess] = useState(false);
 
   useEffect(() => {
     const loadData = async () => {
@@ -150,7 +151,8 @@ export default function BookingForm({ interpreterId, attractionId }: { interpret
         price: '',
       });
       setError(null);
-      router.push('/profile/user/booking');
+      setShowSuccess(true);
+      // router.push('/profile/user/booking'); // Remove auto-redirect
     } catch (error) {
       console.error('Error creating booking:', error);
       setError('Failed to create booking. Please try again.');
@@ -163,6 +165,19 @@ export default function BookingForm({ interpreterId, attractionId }: { interpret
         <h3 className="card-title mb-0">Confirm Booking</h3>
       </div>
       <div className="card-body">
+        {showSuccess && (
+          <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-40 z-50">
+            <div className="bg-white rounded-lg shadow-lg p-8 max-w-sm w-full text-center">
+              <h4 className="text-xl font-semibold mb-4">Booking request is sent</h4>
+              <button
+                className="btn btn-primary w-full"
+                onClick={() => router.push('/profile/user/booking')}
+              >
+                Go to My Bookings
+              </button>
+            </div>
+          </div>
+        )}
         {error && (
           <div className="alert alert-danger" role="alert">
             {error}

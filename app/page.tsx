@@ -10,7 +10,26 @@ export default function Home() {
   const [selectedAttraction, setSelectedAttraction] = useState<Attraction | null>(null);
   const [showInterpreters, setShowInterpreters] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState<string>('all');
+  const [searchTerm, setSearchTerm] = useState('');
   const markersRef = useRef<google.maps.Marker[]>([]);
+
+  // Category color mapping
+  const categoryColors: Record<string, string> = {
+    museum: 'blue',
+    art: 'purple',
+    nature: 'green',
+    historical: 'orange',
+    religion: 'red',
+    other: 'gray',
+  };
+
+  // Filtered attractions by category and search
+  const filteredAttractions = attractions.filter(a => {
+    const matchesCategory = selectedCategory === 'all' || a.category === selectedCategory;
+    const matchesSearch = a.name.toLowerCase().includes(searchTerm.toLowerCase());
+    return matchesCategory && matchesSearch;
+  });
 
   // Stable handler for our custom event
   const handleViewInterpreters = useCallback((event: Event) => {
@@ -79,15 +98,27 @@ export default function Home() {
 
   // Add/remove markers
   useEffect(() => {
-    if (!map || attractions.length === 0) return;
+    if (!map || filteredAttractions.length === 0) return;
 
     // Clear old markers
     markersRef.current.forEach((m) => m.setMap(null));
     markersRef.current = [];
 
-    attractions.forEach((attraction) => {
-      const { latitude: lat, longitude: lng } = attraction;
-      const marker = new google.maps.Marker({ position: { lat, lng }, map, title: attraction.name });
+    filteredAttractions.forEach((attraction) => {
+      const { latitude: lat, longitude: lng, category } = attraction;
+      const marker = new google.maps.Marker({
+        position: { lat, lng },
+        map,
+        title: attraction.name,
+        icon: {
+          path: google.maps.SymbolPath.CIRCLE,
+          scale: 10,
+          fillColor: categoryColors[category] || 'gray',
+          fillOpacity: 1,
+          strokeWeight: 1,
+          strokeColor: '#333',
+        },
+      });
       const infoWindow = new google.maps.InfoWindow({
         content: `
           <div class="p-2">
@@ -131,12 +162,35 @@ export default function Home() {
       // Cleanup event listener
       window.removeEventListener('viewInterpreters', handleViewInterpreters);
     };
-  }, [map, attractions, handleViewInterpreters]);
+  }, [map, filteredAttractions, handleViewInterpreters]);
 
   return (
     <div className="min-h-screen bg-gray-100">
       <div className="container mx-auto px-1 py-8">
-        <h1 className="text-3xl font-bold text-center mb-8">Map</h1>
+        <div className="flex flex-col gap-2 justify-center mb-4">
+          <input
+            type="text"
+            placeholder="Search for an attraction..."
+            value={searchTerm}
+            onChange={e => setSearchTerm(e.target.value)}
+            className="px-3 py-1 rounded border border-gray-300 w-full md:w-80 mx-auto mb-2"
+          />
+          <div className="flex flex-row gap-2 justify-center mb-2">
+            <button
+              className={`px-3 py-1 rounded ${selectedCategory === 'all' ? 'bg-blue-600 text-white' : 'bg-gray-200'}`}
+              onClick={() => setSelectedCategory('all')}
+            >All</button>
+            {['museum', 'art', 'nature', 'historical', 'religion', 'other'].map(cat => (
+              <button
+                key={cat}
+                className={`px-3 py-1 rounded ${selectedCategory === cat ? 'bg-blue-600 text-white' : 'bg-gray-200'}`}
+                style={{ border: `2px solid ${categoryColors[cat]}` }}
+                onClick={() => setSelectedCategory(cat)}
+              >{cat.charAt(0).toUpperCase() + cat.slice(1)}</button>
+            ))}
+          </div>
+        </div>
+
         {errorMessage ? (
           <p className="text-red-500 text-center mb-4">{errorMessage}</p>
         ) : (

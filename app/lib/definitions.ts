@@ -42,7 +42,7 @@ export type Attraction = {
   phone: string | null;
   is_closed: number;
   website: string | null;
-  category: 'museum' | 'art' | 'nature' | 'historical' | 'other';
+  category: 'museum' | 'art' | 'nature' | 'historical' | 'religion' | 'other';
   longitude: number;
   latitude: number;
   created_at: Date;

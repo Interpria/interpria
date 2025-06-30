@@ -109,7 +109,7 @@ export default function InterpreterBookingPage() {
     (b) => b.status === 'confirmed' && new Date(b.start_time) >= now
   );
   const pastBookings = bookings.filter(
-    (b) => b.status === 'confirmed' && new Date(b.start_time) < now
+    (b) => (b.status === 'confirmed' || b.status === 'rated') && new Date(b.start_time) < now
   );
   const cancelledBookings = bookings.filter((b) => b.status === 'cancelled');
 
@@ -144,6 +144,9 @@ export default function InterpreterBookingPage() {
             <button className="btn btn-danger btn-sm mt-2" onClick={() => handleCancelBooking(booking.booking_id)}>
               Cancel
             </button>
+          )}
+          {booking.rating != null && (
+            <span className="badge bg-info mt-2 ms-2">Rated {booking.rating}</span>
           )}
         </div>
       </div>
