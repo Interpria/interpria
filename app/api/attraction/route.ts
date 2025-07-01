@@ -86,24 +86,3 @@ export async function PUT(request: Request) {
     return NextResponse.json({ error: 'Failed to update attraction' }, { status: 500 });
   }
 }
-
-export async function DELETE(request: Request) {
-  try {
-    const { searchParams } = new URL(request.url);
-    const id = searchParams.get('id');
-
-    if (!id) {
-      return NextResponse.json({ error: 'ID is required' }, { status: 400 });
-    }
-
-    const [result] = await conn.query(
-      'DELETE FROM attraction WHERE attraction_id = ?',
-      [id]
-    );
-
-    return NextResponse.json(result);
-  } catch (error) {
-    console.error('Database Error:', error);
-    return NextResponse.json({ error: 'Failed to delete attraction' }, { status: 500 });
-  }
-} 

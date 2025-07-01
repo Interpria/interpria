@@ -52,7 +52,7 @@ export async function DELETE(
   { params }: { params: { id: string } }
 ) {
   try {
-    const { id } = params;
+    const { id } = await params;
     const availabilityId = parseInt(id);
 
     if (isNaN(availabilityId)) {

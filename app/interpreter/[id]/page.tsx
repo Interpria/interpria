@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Interpreterxattraction } from '@/app/lib/definitions';
-import BookingForm from '@/app/components/bookingForm';
+import BookingForm from '@/app/components/BookingForm';
 import { useSearchParams } from 'next/navigation';
 
 const weekdays = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];

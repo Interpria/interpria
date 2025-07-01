@@ -96,6 +96,7 @@ export default function CreateAttractionPage() {
                   <option value="art">Art</option>
                   <option value="nature">Nature</option>
                   <option value="historical">Historical</option>
+                  <option value="religion">Religion</option>
                   <option value="other">Other</option>
                 </select>
               </div>

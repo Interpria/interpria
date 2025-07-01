@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Language } from '@/app/lib/definitions';
-import { fetchCurrentInterpreterId } from '@/app/components/currentInterpreter';
+import { fetchCurrentInterpreterId } from '@/app/components/CurrentInterpreter';
 
 export default function UpdateInterpreterPage() {
   const router = useRouter();

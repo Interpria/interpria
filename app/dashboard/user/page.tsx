@@ -22,7 +22,7 @@ export default async function UserPage() {
             <th scope="col">email</th>
             <th scope="col">name</th>
             <th scope="col">role</th>
-            <th scope="col">phone_num</th>
+            <th scope="col">phone</th>
             <th scope="col">created_at</th>
             <th scope="col">updated_at</th>
             <th scope="col">actions</th>
@@ -36,7 +36,7 @@ export default async function UserPage() {
                 <td>{user.email}</td>
                 <td>{user.name}</td>  
                 <td>{user.role}</td>
-                <td>{user.phone_num}</td>
+                <td>{user.phone}</td>
                 <td>{new Date(user.created_at).toLocaleDateString()}</td>
                 <td>{new Date(user.updated_at).toLocaleDateString()}</td>
                 <td>

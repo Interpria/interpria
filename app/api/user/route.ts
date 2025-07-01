@@ -33,15 +33,17 @@ export async function fetchUser() {
   }
 }
 
-
-
 export async function POST(request: Request) {
   try {
-    const { email, name, role, phone_num } = await request.json();
-    
+    const { email, name, role, phone } = await request.json();
+    // Set default password as 'password' and hash it
+    const bcrypt = require('bcryptjs');
+    const defaultPassword = 'password';
+    const password_hash = await bcrypt.hash(defaultPassword, 10);
+
     const [result] = await conn.query(
-      'INSERT INTO user (email, name, role, phone_num) VALUES (?, ?, ?, ?)',
-      [email, name, role, phone_num]
+      'INSERT INTO user (email, name, role, phone, password_hash) VALUES (?, ?, ?, ?, ?)',
+      [email, name, role, phone, password_hash]
     );
     
     return NextResponse.json({ message: 'User created successfully', result });
@@ -53,11 +55,11 @@ export async function POST(request: Request) {
 
 export async function PUT(request: Request) {
   try {
-    const { user_id, email, name, role, phone_num } = await request.json();
+    const { user_id, email, name, role, phone } = await request.json();
     
     const [result] = await conn.query(
-      'UPDATE user SET email = ?, name = ?, role = ?, phone_num = ? WHERE user_id = ?',
-      [email, name, role, phone_num, user_id]
+      'UPDATE user SET email = ?, name = ?, role = ?, phone = ? WHERE user_id = ?',
+      [email, name, role, phone, user_id]
     );
     
     return NextResponse.json({ message: 'User updated successfully', result });

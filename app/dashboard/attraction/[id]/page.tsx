@@ -1,9 +1,9 @@
-import { fetchAttractionById, fetchInterpreterxattractionByAttractionId } from '@/app/api/attraction/route';
-import { fetchInterpreterById } from '@/app/api/interpreter/route';
+import { fetchInterpreterxattractionByAttractionId } from '@/app/api/attraction/route';
+import { fetchAttractionById } from '@/app/api/attraction/[id]/route';
+import { fetchInterpreterById } from '@/app/api/interpreter/[id]/route';
 import Link from 'next/link';
-import { Interpreterxattraction, Interpreter, User } from '@/app/lib/definitions';
 import DeleteAttractionButton from '../DeleteAttractionButton';
-import { useState, useEffect } from 'react';
+import AvailabilityAttractionSection from '@/app/components/AvailabilityAttractionSection';
 
 export default async function AttractionDetailsPage({
   params,
@@ -54,6 +54,10 @@ export default async function AttractionDetailsPage({
               </div>
             </div>
           </div>
+
+          <AvailabilityAttractionSection
+            attractionId={attractionId}
+          />
 
           <div className='card mb-4'>
             <div className='card-body'>

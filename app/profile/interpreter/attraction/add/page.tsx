@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Attraction, Interpreter } from '@/app/lib/definitions';
-import { fetchCurrentInterpreterId } from '@/app/components/currentInterpreter';
+import { fetchCurrentInterpreterId } from '@/app/components/CurrentInterpreter';
 
 export default function AddAttractionPage() {
   const router = useRouter();

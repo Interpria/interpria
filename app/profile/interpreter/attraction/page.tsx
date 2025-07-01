@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { fetchCurrentInterpreterId } from '@/app/components/currentInterpreter';
+import { fetchCurrentInterpreterId } from '@/app/components/CurrentInterpreter';
 
 const weekdays = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 

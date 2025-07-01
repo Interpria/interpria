@@ -2,7 +2,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { Interpreter } from '@/app/lib/definitions';
-import { fetchCurrentInterpreterId } from '@/app/components/currentInterpreter';
+import { fetchCurrentInterpreterId } from '@/app/components/CurrentInterpreter';
 
 export default function InterpreterBookingPage() {
   const [interpreter, setInterpreter] = useState<Interpreter | null>(null);

@@ -76,8 +76,6 @@ export type AvailabilityAttraction = {
   weekday: number;
   start_time: string;
   end_time: string;
-  created_at: Date;
-  updated_at: Date;
 };
 
 export type AvailabilityInterpreter = {

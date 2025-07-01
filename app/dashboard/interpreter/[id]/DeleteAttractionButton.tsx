@@ -17,7 +17,7 @@ export default function DeleteAttractionButton({ interpreterId, attractionId, at
     }
 
     try {
-      const response = await fetch(`/api/interpreterxattraction/${interpreterId}/${attractionId}`, {
+      const response = await fetch(`/api/interpreterxattraction/interpreter/${interpreterId}/${attractionId}`, {
         method: 'DELETE',
       });
 
