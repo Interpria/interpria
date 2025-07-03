@@ -1,15 +1,7 @@
 import { NextResponse } from 'next/server';
-import mysql from 'mysql2/promise';
+import pool from '@/app/lib/db';
 import bcrypt from 'bcrypt';
 import { User } from '@/app/lib/definitions';
-
-const conn = await mysql.createConnection({
-  host: process.env.MYSQL_HOST,
-  user: process.env.MYSQL_USER,
-  password: process.env.MYSQL_PASSWORD,
-  database: process.env.MYSQL_DATABASE,
-  port: process.env.MYSQL_PORT ? parseInt(process.env.MYSQL_PORT) : 3306,
-});
 
 export async function POST(request: Request) {
   try {
@@ -24,7 +16,7 @@ export async function POST(request: Request) {
     }
 
     // Check if email already exists
-    const [existingUsers] = await conn.query(
+    const [existingUsers] = await pool.query(
       'SELECT * FROM user WHERE email = ?',
       [email]
     );
@@ -41,7 +33,7 @@ export async function POST(request: Request) {
     const passwordHash = await bcrypt.hash(password, saltRounds);
 
     // Insert new user
-    await conn.query(
+    await pool.query(
       'INSERT INTO user (name, email, password_hash, role, phone) VALUES (?, ?, ?, ?, ?)',
       [name, email, passwordHash, 'traveler', phone || null]
     );

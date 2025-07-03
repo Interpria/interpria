@@ -1,17 +1,9 @@
 import { NextResponse } from 'next/server';
-import mysql from 'mysql2/promise';
-
-const conn = await mysql.createConnection({
-  host: process.env.MYSQL_HOST,
-  user: process.env.MYSQL_USER,
-  password: process.env.MYSQL_PASSWORD,
-  database: process.env.MYSQL_DATABASE,
-  port: process.env.MYSQL_PORT? parseInt(process.env.MYSQL_PORT) : 3306,
-});
+import pool from '@/app/lib/db';
 
 export async function GET() {
   try {
-    const [rows] = await conn.query(`
+    const [rows] = await pool.query(`
       SELECT * FROM language 
       ORDER BY name ASC
     `);
@@ -29,7 +21,7 @@ export async function POST(request: Request) {
   try {
     const { code, name } = await request.json();
     
-    const [result] = await conn.query(
+    const [result] = await pool.query(
       'INSERT INTO language (code, name) VALUES (?, ?)',
       [code || null, name]
     );
@@ -45,7 +37,7 @@ export async function PUT(request: Request) {
   try {
     const { language_id, code, name } = await request.json();
     
-    const [result] = await conn.query(
+    const [result] = await pool.query(
       'UPDATE language SET code = ?, name = ? WHERE language_id = ?',
       [code || null, name, language_id]
     );
@@ -61,7 +53,7 @@ export async function DELETE(request: Request) {
   try {
     const { language_id } = await request.json();
     
-    const [result] = await conn.query(
+    const [result] = await pool.query(
       'DELETE FROM language WHERE language_id = ?',
       [language_id]
     );

@@ -1,15 +1,7 @@
 import { NextResponse } from 'next/server';
-import mysql from 'mysql2/promise';
 import { fetchInterpreter } from '@/app/lib/interpreter';
 import { Interpreter, User } from '@/app/lib/definitions';
-
-const conn = await mysql.createConnection({
-  host: process.env.MYSQL_HOST,
-  user: process.env.MYSQL_USER,
-  password: process.env.MYSQL_PASSWORD,
-  database: process.env.MYSQL_DATABASE,
-  port: process.env.MYSQL_PORT? parseInt(process.env.MYSQL_PORT) : 3306,
-});
+import pool from '@/app/lib/db';
 
 export async function GET() {
   try {
@@ -38,7 +30,7 @@ export async function POST(request: Request) {
     }
 
     // Check if user exists and is not already an interpreter
-    const [existingUser] = await conn.query(
+    const [existingUser] = await pool.query(
       'SELECT * FROM user WHERE user_id = ?',
       [user_id]
     );
@@ -50,7 +42,7 @@ export async function POST(request: Request) {
       );
     }
 
-    const [existingInterpreter] = await conn.query(
+    const [existingInterpreter] = await pool.query(
       'SELECT * FROM interpreter WHERE user_id = ?',
       [user_id]
     );
@@ -63,7 +55,7 @@ export async function POST(request: Request) {
     }
 
     // Create interpreter
-    await conn.query(
+    await pool.query(
       `INSERT INTO interpreter (user_id, gender, bio, introduction, primary_language_id, created_at, updated_at)
        VALUES (?, ?, ?, ?, ?, NOW(), NOW())`,
       [user_id, gender, bio, introduction, primary_language_id]
@@ -95,7 +87,7 @@ export async function DELETE(request: Request) {
     }
 
     // Check if interpreter exists
-    const [existingInterpreter] = await conn.query(
+    const [existingInterpreter] = await pool.query(
       'SELECT * FROM interpreter WHERE interpreter_id = ?',
       [id]
     );
@@ -108,13 +100,13 @@ export async function DELETE(request: Request) {
     }
 
     // Delete related records first
-    await conn.query('DELETE FROM interpreterxlanguage WHERE interpreter_id = ?', [id]);
-    await conn.query('DELETE FROM interpreterxattraction WHERE interpreter_id = ?', [id]);
-    await conn.query('DELETE FROM availability_interpreter WHERE interpreter_id = ?', [id]);
-    await conn.query('DELETE FROM booking WHERE interpreter_id = ?', [id]);
+    await pool.query('DELETE FROM interpreterxlanguage WHERE interpreter_id = ?', [id]);
+    await pool.query('DELETE FROM interpreterxattraction WHERE interpreter_id = ?', [id]);
+    await pool.query('DELETE FROM availability_interpreter WHERE interpreter_id = ?', [id]);
+    await pool.query('DELETE FROM booking WHERE interpreter_id = ?', [id]);
 
     // Delete interpreter
-    await conn.query('DELETE FROM interpreter WHERE interpreter_id = ?', [id]);
+    await pool.query('DELETE FROM interpreter WHERE interpreter_id = ?', [id]);
 
     return NextResponse.json(
       { message: 'Interpreter deleted successfully' },

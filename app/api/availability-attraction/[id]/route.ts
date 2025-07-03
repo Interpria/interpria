@@ -1,14 +1,6 @@
 import { NextResponse } from 'next/server';
-import mysql from 'mysql2/promise';
+import pool from '@/app/lib/db';
 import { AvailabilityAttraction } from '@/app/lib/definitions';
-
-const conn = await mysql.createConnection({
-  host: process.env.MYSQL_HOST,
-  user: process.env.MYSQL_USER,
-  password: process.env.MYSQL_PASSWORD,
-  database: process.env.MYSQL_DATABASE,
-  port: process.env.MYSQL_PORT ? parseInt(process.env.MYSQL_PORT) : 3306,
-});
 
 export async function GET(
   request: Request,
@@ -21,7 +13,7 @@ export async function GET(
   }
 
   try {
-    const [rows] = await conn.query(
+    const [rows] = await pool.query(
       'SELECT * FROM availability_attraction WHERE attraction_id = ?',
       [attractionId]
     );
@@ -58,7 +50,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
     }
 
     // Insert the new availability
-    await conn.query(
+    await pool.query(
       'INSERT INTO availability_attraction (attraction_id, weekday, start_time, end_time) VALUES (?, ?, ?, ?)',
       [attractionId, weekday, start_time, end_time]
     );
@@ -89,7 +81,7 @@ export async function DELETE(request: Request, { params }: { params: Promise<{ i
     }
 
     // Delete the availability
-    await conn.query(
+    await pool.query(
       'DELETE FROM availability_attraction WHERE availability_id = ?',
       [availabilityId]
     );

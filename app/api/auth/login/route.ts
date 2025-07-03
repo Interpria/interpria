@@ -1,18 +1,10 @@
 import { NextResponse  } from 'next/server';
-import mysql from 'mysql2/promise';
+import pool from '@/app/lib/db';
 import bcrypt from 'bcrypt';
 import { createToken } from '@/lib/jwt';
 import { verifyToken } from '@/lib/jwt';      // implement this to verify your token
 import { cookies } from 'next/headers';       // for Next.js 13+ App Router
 import { User } from '@/app/lib/definitions';
-
-const conn = await mysql.createConnection({
-  host: process.env.MYSQL_HOST,
-  user: process.env.MYSQL_USER,
-  password: process.env.MYSQL_PASSWORD,
-  database: process.env.MYSQL_DATABASE,
-  port: process.env.MYSQL_PORT ? parseInt(process.env.MYSQL_PORT) : 3306,
-});
 
 export async function POST(request: Request) {
   try {
@@ -27,7 +19,7 @@ export async function POST(request: Request) {
     }
 
     // Find user by email
-    const [rows] = await conn.query(
+    const [rows] = await pool.query(
       'SELECT * FROM user WHERE email = ?',
       [email]
     );

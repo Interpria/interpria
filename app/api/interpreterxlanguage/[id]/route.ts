@@ -1,13 +1,5 @@
 import { NextResponse } from 'next/server';
-import mysql from 'mysql2/promise';
-
-const conn = await mysql.createConnection({
-  host: process.env.MYSQL_HOST,
-  user: process.env.MYSQL_USER,
-  password: process.env.MYSQL_PASSWORD,
-  database: process.env.MYSQL_DATABASE,
-  port: process.env.MYSQL_PORT? parseInt(process.env.MYSQL_PORT) : 3306,
-});
+import pool from '@/app/lib/db';
 
 export async function PUT(
   request: Request,
@@ -19,7 +11,7 @@ export async function PUT(
     const interpreterId = parseInt(id);
 
     // First, delete all existing language associations
-    await conn.query(
+    await pool.query(
       'DELETE FROM interpreterxlanguage WHERE interpreter_id = ?',
       [interpreterId]
     );
@@ -27,7 +19,7 @@ export async function PUT(
     // Then, insert the new language associations
     if (language_ids.length > 0) {
       const values = language_ids.map((langId: number) => [interpreterId, langId]);
-      await conn.query(
+      await pool.query(
         'INSERT INTO interpreterxlanguage (interpreter_id, language_id) VALUES ?',
         [values]
       );
@@ -55,7 +47,7 @@ export async function GET(
       return NextResponse.json({ error: 'Invalid interpreter ID' }, { status: 400 });
     }
 
-    const [rows] = await conn.query(
+    const [rows] = await pool.query(
       `SELECT il.language_id, l.name
        FROM interpreterxlanguage il
        JOIN language l ON il.language_id = l.language_id

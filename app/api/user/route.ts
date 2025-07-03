@@ -1,18 +1,10 @@
 import { NextResponse } from 'next/server';
-import mysql from 'mysql2/promise';
 import bcrypt from 'bcryptjs';
-
-const conn = await mysql.createConnection({
-  host: process.env.MYSQL_HOST,
-  user: process.env.MYSQL_USER,
-  password: process.env.MYSQL_PASSWORD,
-  database: process.env.MYSQL_DATABASE,
-  port: process.env.MYSQL_PORT? parseInt(process.env.MYSQL_PORT) : 3306,
-});
+import pool from '@/app/lib/db';
 
 export async function GET() {
   try {
-    const [rows] = await conn.query('SELECT * FROM `user`');
+    const [rows] = await pool.query('SELECT * FROM `user`');
     return NextResponse.json(rows);
   } catch (error) {
     console.error('Database Error:', error);
@@ -30,7 +22,7 @@ export async function POST(request: Request) {
     const defaultPassword = 'password';
     const password_hash = await bcrypt.hash(defaultPassword, 10);
 
-    const [result] = await conn.query(
+    const [result] = await pool.query(
       'INSERT INTO user (email, name, role, phone, password_hash) VALUES (?, ?, ?, ?, ?)',
       [email, name, role, phone, password_hash]
     );
@@ -46,7 +38,7 @@ export async function PUT(request: Request) {
   try {
     const { user_id, email, name, role, phone } = await request.json();
     
-    const [result] = await conn.query(
+    const [result] = await pool.query(
       'UPDATE user SET email = ?, name = ?, role = ?, phone = ? WHERE user_id = ?',
       [email, name, role, phone, user_id]
     );
@@ -62,7 +54,7 @@ export async function DELETE(request: Request) {
   try {
     const { user_id } = await request.json();
     
-    const [result] = await conn.query(
+    const [result] = await pool.query(
       'DELETE FROM user WHERE user_id = ?',
       [user_id]
     );

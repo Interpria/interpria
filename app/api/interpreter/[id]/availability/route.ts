@@ -1,14 +1,6 @@
 import { NextResponse } from 'next/server';
-import mysql from 'mysql2/promise';
 import { fetchAvailabilityInterpreterByInterpreterId } from '@/app/lib/availability-interpreter';
-
-const conn = await mysql.createConnection({
-  host: process.env.MYSQL_HOST,
-  user: process.env.MYSQL_USER,
-  password: process.env.MYSQL_PASSWORD,
-  database: process.env.MYSQL_DATABASE,
-  port: process.env.MYSQL_PORT? parseInt(process.env.MYSQL_PORT) : 3306,
-});
+import pool from '@/app/lib/db';
 
 export async function POST(request: Request) {
   try {
@@ -32,7 +24,7 @@ export async function POST(request: Request) {
     }
 
     // Add availability
-    await conn.query(
+    await pool.query(
       `INSERT INTO availability_interpreter 
        (interpreter_id, attraction_id, weekday, start_time, end_time, created_at, updated_at) 
        VALUES (?, ?, ?, ?, ?, NOW(), NOW())`,

@@ -1,13 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
+import pool from '@/app/lib/db';
 import mysql from 'mysql2/promise';
-
-const conn = await mysql.createConnection({
-host: process.env.MYSQL_HOST,
-user: process.env.MYSQL_USER,
-password: process.env.MYSQL_PASSWORD,
-database: process.env.MYSQL_DATABASE,
-port: process.env.MYSQL_PORT ? parseInt(process.env.MYSQL_PORT) : 3306,
-});
 
 export async function POST(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -23,18 +16,18 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
   }
 
   // Get interpreter_id for this booking
-  const [rows] = await conn.execute<mysql.RowDataPacket[]>('SELECT interpreter_id FROM booking WHERE booking_id = ?', [id]);
+  const [rows] = await pool.execute<mysql.RowDataPacket[]>('SELECT interpreter_id FROM booking WHERE booking_id = ?', [id]);
   const interpreterId = Array.isArray(rows) && rows.length > 0 ? rows[0].interpreter_id : null;
   console.log('Interpreter ID:', interpreterId);
   if (!interpreterId) {
-    await conn.end();
+    await pool.end();
     return NextResponse.json({ error: 'Interpreter not found for this booking' }, { status: 404 });
   }
 
-  await conn.execute('UPDATE booking SET rating = ?, status = "rated" WHERE booking_id = ?', [rating, id]);
+  await pool.execute('UPDATE booking SET rating = ?, status = "rated" WHERE booking_id = ?', [rating, id]);
 
   // Update interpreter's average rating
-  await conn.execute(`
+  await pool.execute(`
     UPDATE interpreter i
     JOIN (
       SELECT interpreter_id, AVG(rating) as avg_rating
@@ -46,6 +39,6 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
     WHERE i.interpreter_id = ?
   `, [interpreterId, interpreterId]);
 
-  await conn.end();
+  await pool.end();
   return NextResponse.json({ success: true });
 }

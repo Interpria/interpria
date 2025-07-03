@@ -1,14 +1,6 @@
 import { NextResponse } from 'next/server';
-import mysql from 'mysql2/promise';
 import { fetchInterpreterById } from '@/app/lib/interpreter';
-
-const conn = await mysql.createConnection({
-  host: process.env.MYSQL_HOST,
-  user: process.env.MYSQL_USER,
-  password: process.env.MYSQL_PASSWORD,
-  database: process.env.MYSQL_DATABASE,
-  port: process.env.MYSQL_PORT? parseInt(process.env.MYSQL_PORT) : 3306,
-});
+import pool from '@/app/lib/db';
 
 export async function GET(request: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
@@ -51,7 +43,7 @@ export async function PUT(
     } = data;
 
     // Update interpreter and user tables
-    await conn.query(
+    await pool.query(
       `
       UPDATE interpreter i
       SET 

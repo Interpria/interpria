@@ -1,13 +1,5 @@
 import { NextResponse } from 'next/server';
-import mysql from 'mysql2/promise';
-
-const conn = await mysql.createConnection({
-  host: process.env.MYSQL_HOST,
-  user: process.env.MYSQL_USER,
-  password: process.env.MYSQL_PASSWORD,
-  database: process.env.MYSQL_DATABASE,
-  port: process.env.MYSQL_PORT? parseInt(process.env.MYSQL_PORT) : 3306,
-});
+import pool from '@/app/lib/db';
 
 export async function GET(
   request: Request,
@@ -25,7 +17,7 @@ export async function GET(
       );
     }
 
-    const [rows] = await conn.query(
+    const [rows] = await pool.query(
       'SELECT * FROM interpreterxattraction WHERE interpreter_id = ? AND attraction_id = ?',
       [interpreterId, attractionId]
     );
@@ -66,7 +58,7 @@ export async function PUT(
 
     const { duration, buffer_time, max_traveler, price } = body;
 
-    const [result] = await conn.query(
+    const [result] = await pool.query(
       `UPDATE interpreterxattraction 
        SET duration = ?, buffer_time = ?, max_traveler = ?, price = ?
        WHERE interpreter_id = ? AND attraction_id = ?`,
@@ -107,13 +99,13 @@ export async function DELETE(
     }
 
     // Delete related availability records first
-    await conn.query(
+    await pool.query(
       'DELETE FROM availability_interpreter WHERE interpreter_id = ? AND attraction_id = ?',
       [interpreterId, attractionId]
     );
 
     // Delete the attraction from interpreter
-    const [result] = await conn.query(
+    const [result] = await pool.query(
       'DELETE FROM interpreterxattraction WHERE interpreter_id = ? AND attraction_id = ?',
       [interpreterId, attractionId]
     );

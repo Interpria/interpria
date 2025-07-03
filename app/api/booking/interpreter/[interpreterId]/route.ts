@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server';
 import { fetchBookingsByInterpreterId } from '@/app/lib/booking';
 
-
 export async function GET(request: Request, { params }: { params: Promise<{ interpreterId: string }> }) {
   const { interpreterId } = await params;
   if (!interpreterId) {

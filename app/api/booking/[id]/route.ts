@@ -1,14 +1,6 @@
 import { NextResponse } from 'next/server';
-import mysql from 'mysql2/promise';
 import { fetchBookingsById } from '@/app/lib/booking';
-
-const conn = await mysql.createConnection({
-  host: process.env.MYSQL_HOST,
-  user: process.env.MYSQL_USER,
-  password: process.env.MYSQL_PASSWORD,
-  database: process.env.MYSQL_DATABASE,
-  port: process.env.MYSQL_PORT? parseInt(process.env.MYSQL_PORT) : 3306,
-});
+import pool from '@/app/lib/db';
 
 
 export async function GET(request: Request, { params }: { params: Promise<{ id: string }> }) {
@@ -34,7 +26,7 @@ export async function DELETE(
     const { id } = await params;
 
     // Delete the booking
-    await conn.query(
+    await pool.query(
       'DELETE FROM booking WHERE booking_id = ?',
       [id]
     );
@@ -68,7 +60,7 @@ export async function PATCH(
       );
     }
 
-    await conn.query(
+    await pool.query(
       'UPDATE booking SET status = ? WHERE booking_id = ?',
       [status, id]
     );

@@ -1,14 +1,6 @@
 import { NextResponse } from 'next/server';
-import mysql from 'mysql2/promise';
 import { fetchInterpreterxattractionByInterpreterId } from '@/app/lib/interpreterxattraction';
-
-const conn = await mysql.createConnection({
-  host: process.env.MYSQL_HOST,
-  user: process.env.MYSQL_USER,
-  password: process.env.MYSQL_PASSWORD,
-  database: process.env.MYSQL_DATABASE,
-  port: process.env.MYSQL_PORT? parseInt(process.env.MYSQL_PORT) : 3306,
-});
+import pool from '@/app/lib/db';
 
 export async function GET(request: Request, { params }: { params: Promise<{ interpreterId: string }> }) {
   try {
@@ -43,7 +35,7 @@ export async function POST(
     }
 
     // Add attraction to interpreter
-    await conn.query(
+    await pool.query(
       `INSERT INTO interpreterxattraction 
        (interpreter_id, attraction_id, duration, buffer_time, max_traveler, price) 
        VALUES (?, ?, ?, ?, ?, ?)`,

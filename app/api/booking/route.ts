@@ -1,14 +1,6 @@
 import { NextResponse } from 'next/server';
-import mysql from 'mysql2/promise';
 import { Booking } from '@/app/lib/definitions';
-
-const conn = await mysql.createConnection({
-  host: process.env.MYSQL_HOST,
-  user: process.env.MYSQL_USER,
-  password: process.env.MYSQL_PASSWORD,
-  database: process.env.MYSQL_DATABASE,
-  port: process.env.MYSQL_PORT? parseInt(process.env.MYSQL_PORT) : 3306,
-})
+import pool from '@/app/lib/db';
 
 export async function POST(request: Request) {
   try {
@@ -34,7 +26,7 @@ export async function POST(request: Request) {
     }
 
     // Check if the interpreter is available for the selected time slot
-    const [existingBookings] = await conn.query(`
+    const [existingBookings] = await pool.query(`
       SELECT * FROM booking 
       WHERE interpreter_id = ? 
       AND (
@@ -56,7 +48,7 @@ export async function POST(request: Request) {
       );
     }
 
-    await conn.query(`
+    await pool.query(`
       INSERT INTO booking (
         user_id, 
         interpreter_id, 

@@ -1,14 +1,6 @@
 import { NextResponse } from 'next/server';
-import mysql from 'mysql2/promise';
 import { Interpreterxattraction } from '@/app/lib/definitions';
-
-const conn = await mysql.createConnection({
-  host: process.env.MYSQL_HOST,
-  user: process.env.MYSQL_USER,
-  password: process.env.MYSQL_PASSWORD,
-  database: process.env.MYSQL_DATABASE,
-  port: process.env.MYSQL_PORT? parseInt(process.env.MYSQL_PORT) : 3306,
-});
+import pool from '@/app/lib/db';
 
 export async function POST(request: Request) {
   try {
@@ -24,7 +16,7 @@ export async function POST(request: Request) {
     }
 
     // Check if the attraction is already assigned to this interpreter
-    const [existing] = await conn.query(
+    const [existing] = await pool.query(
       'SELECT * FROM interpreterxattraction WHERE interpreter_id = ? AND attraction_id = ?',
       [interpreter_id, attraction_id]
     );
@@ -37,7 +29,7 @@ export async function POST(request: Request) {
     }
 
     // Add attraction to interpreter
-    await conn.query(
+    await pool.query(
       `INSERT INTO interpreterxattraction 
        (interpreter_id, attraction_id, duration, price, buffer_time, max_traveler) 
        VALUES (?, ?, ?, ?, ?, ?)`,

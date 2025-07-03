@@ -1,13 +1,5 @@
 import { NextResponse } from 'next/server';
-import mysql from 'mysql2/promise';
-
-const conn = await mysql.createConnection({
-  host: process.env.MYSQL_HOST,
-  user: process.env.MYSQL_USER,
-  password: process.env.MYSQL_PASSWORD,
-  database: process.env.MYSQL_DATABASE,
-  port: process.env.MYSQL_PORT? parseInt(process.env.MYSQL_PORT) : 3306,
-});
+import pool from '@/app/lib/db';
 
 export async function GET(
   request: Request,
@@ -24,7 +16,7 @@ export async function GET(
       );
     }
 
-    const [rows] = await conn.query(
+    const [rows] = await pool.query(
       `SELECT ixa.*, u.name, i.*,
               GROUP_CONCAT(DISTINCT l.name) as languages,
               (SELECT l2.name FROM language l2 WHERE l2.language_id = i.primary_language_id) as primary_language
