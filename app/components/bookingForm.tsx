@@ -2,10 +2,11 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { Interpreter, Language } from '../lib/definitions';
 
 export default function BookingForm({ interpreterId, attractionId }: { interpreterId: number, attractionId: number }) {
   const router = useRouter();
-  const [languages, setLanguages] = useState<any[]>([]);
+  const [languages, setLanguages] = useState<Language[]>([]);
   const [selectedLanguage, setSelectedLanguage] = useState<number | ''>('');
   const [interpreterName, setInterpreterName] = useState<string>('');
   const [attractionName, setAttractionName] = useState<string>('');
@@ -18,7 +19,6 @@ export default function BookingForm({ interpreterId, attractionId }: { interpret
   const [error, setError] = useState<string | null>(null);
   const [userId, setUserId] = useState<number | null>(null);
   const [interpreterLanguages, setInterpreterLanguages] = useState<number[]>([]);
-  const [interpretAttraction, setInterpretAttraction] = useState<any>(null);
   const [price, setPrice] = useState<number | null>(null);
   const [showSuccess, setShowSuccess] = useState(false);
 
@@ -31,14 +31,13 @@ export default function BookingForm({ interpreterId, attractionId }: { interpret
         const languageData = await languageResponse.json();
         setLanguages(languageData);
 
-        let interpreterData: any = [];
+        let interpreterData: (Partial<Interpreter> & { name: string; languages: string; primary_language: string }) = { name: '', languages: '', primary_language: '' };
         // Fetch interpreter details
         const interpreterResponse = await fetch(`/api/interpreter/${interpreterId}`);
         if (interpreterResponse.ok) {
           interpreterData = await interpreterResponse.json();
           setInterpreterName(
-            interpreterData?.name ||
-            (Array.isArray(interpreterData) ? interpreterData[0]?.name : '')
+            interpreterData?.name || (Array.isArray(interpreterData) ? interpreterData[0]?.name : '')
           );
         }
 
@@ -53,9 +52,9 @@ export default function BookingForm({ interpreterId, attractionId }: { interpret
         // fetch interpreter details (if not already fetched)
         let primary_language_id: number | undefined = undefined;
         let primary_language_name: string | undefined = undefined;
-        if (interpreterData[0]?.primary_language_id && interpreterData[0]?.primary_language) {
-          primary_language_id = interpreterData[0].primary_language_id;
-          primary_language_name = interpreterData[0].primary_language;
+        if (interpreterData?.primary_language_id && interpreterData?.primary_language) {
+          primary_language_id = interpreterData.primary_language_id;
+          primary_language_name = interpreterData.primary_language;
         }
 
         // add primary language if not already in the list
@@ -84,7 +83,6 @@ export default function BookingForm({ interpreterId, attractionId }: { interpret
         if (interpretAttractionResponse.ok) {
           const interpretAttractionData = await interpretAttractionResponse.json();
           console.log('Interpretation Attraction Data:', interpretAttractionData);
-          setInterpretAttraction(interpretAttractionData);
           setPrice(interpretAttractionData?.price || null);
         } else {
           setError('Failed to fetch interpretation details for the attraction');

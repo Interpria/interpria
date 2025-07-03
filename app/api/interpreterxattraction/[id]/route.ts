@@ -26,17 +26,10 @@ export async function DELETE(
     }
 
     // Delete the interpreterxattraction
-    const [result] = await conn.query(
+    await conn.query(
       'DELETE FROM interpreterxattraction WHERE interpreterxattraction_id = ?',
       [interpreterxattraction_id]
     );
-
-    if ((result as any).affectedRows === 0) {
-      return NextResponse.json(
-        { error: 'Interpreterxattraction not found' },
-        { status: 404 }
-      );
-    }
 
     return NextResponse.json(
       { message: 'Interpreterxattraction deleted successfully' },

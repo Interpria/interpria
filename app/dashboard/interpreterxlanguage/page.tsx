@@ -1,4 +1,4 @@
-import {fetchInterpreterxlanguage} from '@/app/api/interpreterxlanguage/route';
+import {fetchInterpreterxlanguage} from '@/app/lib/interpreterxlanguage';
 
 export default async function InterpreterLanguagePage() {
   const interpreterLanguages = await fetchInterpreterxlanguage();

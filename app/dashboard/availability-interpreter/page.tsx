@@ -1,4 +1,4 @@
-import { fetchAvailabilityInterpreter } from '@/app/api/interpreter/route';
+import { fetchAvailabilityInterpreter } from '@/app/lib/availability-interpreter';
 
 export default async function AvailabilityInterpreterPage() {
   const availabilityInterpreters = await fetchAvailabilityInterpreter();
@@ -6,7 +6,7 @@ export default async function AvailabilityInterpreterPage() {
     return (  
       <>
         <div className='d-flex flex-column align-items-center justify-content-center gap-3 p-5 m-5'>
-            <h1>Manage Interpreter's Availability</h1>
+            <h1>Manage Interpreter Availability</h1>
 
             <table className="table table-striped">
               <thead>

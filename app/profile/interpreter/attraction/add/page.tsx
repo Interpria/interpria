@@ -39,7 +39,7 @@ export default function AddAttractionPage() {
       }
       const data = await response.json();
       setInterpreter(Array.isArray(data) ? data[0] : data);
-      } catch (err) {
+      } catch {
       setError('Failed to load interpreter data');
       } finally {
       setIsLoading(false);

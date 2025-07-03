@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import mysql from 'mysql2/promise';
-import { Interpreter, User, AvailabilityInterpreter } from '@/app/lib/definitions';
+import { fetchInterpreter } from '@/app/lib/interpreter';
+import { Interpreter, User } from '@/app/lib/definitions';
 
 const conn = await mysql.createConnection({
   host: process.env.MYSQL_HOST,
@@ -23,37 +24,6 @@ export async function GET() {
   }
 }
 
-export async function fetchInterpreter() {
-  try {
-    const [rows] = await conn.query(`
-      SELECT
-        i.*,
-        u.name,
-        GROUP_CONCAT(DISTINCT l.name) as languages,
-        (SELECT l2.name FROM language l2 WHERE l2.language_id = i.primary_language_id) as primary_language
-      FROM interpreter i 
-      JOIN user u ON i.user_id = u.user_id
-      LEFT JOIN interpreterxlanguage il ON i.interpreter_id = il.interpreter_id
-      LEFT JOIN language l ON il.language_id = l.language_id
-      GROUP BY i.interpreter_id
-    `);
-    return rows as (Interpreter & { name: string; languages: string; primary_language: string })[];
-  }catch (error) {
-    console.error('Database Error:', error);
-    throw new Error('Failed to fetch interpreter data.');
-  }
-}
-
-export async function fetchAvailabilityInterpreter() {
-  try {
-    const [rows] = await conn.query('SELECT * FROM `availability_interpreter`');
-    return rows as AvailabilityInterpreter[];
-  }catch (error) {
-    console.error('Database Error:', error);
-    throw new Error('Failed to fetch availability_interpreter data.');
-  }
-}
-
 export async function POST(request: Request) {
   try {
     const body = await request.json();
@@ -73,7 +43,7 @@ export async function POST(request: Request) {
       [user_id]
     );
 
-    if (!existingUser || (existingUser as any[]).length === 0) {
+    if (!existingUser || (existingUser as User[]).length === 0) {
       return NextResponse.json(
         { error: 'User not found' },
         { status: 404 }
@@ -85,7 +55,7 @@ export async function POST(request: Request) {
       [user_id]
     );
 
-    if ((existingInterpreter as any[]).length > 0) {
+    if ((existingInterpreter as Interpreter[]).length > 0) {
       return NextResponse.json(
         { error: 'User is already an interpreter' },
         { status: 400 }
@@ -93,14 +63,14 @@ export async function POST(request: Request) {
     }
 
     // Create interpreter
-    const [result] = await conn.query(
+    await conn.query(
       `INSERT INTO interpreter (user_id, gender, bio, introduction, primary_language_id, created_at, updated_at)
        VALUES (?, ?, ?, ?, ?, NOW(), NOW())`,
       [user_id, gender, bio, introduction, primary_language_id]
     );
 
     return NextResponse.json(
-      { message: 'Interpreter created successfully', interpreter_id: (result as any).insertId },
+      { message: 'Interpreter created successfully' },
       { status: 201 }
     );
   } catch (error) {
@@ -130,7 +100,7 @@ export async function DELETE(request: Request) {
       [id]
     );
 
-    if (!existingInterpreter || (existingInterpreter as any[]).length === 0) {
+    if (!existingInterpreter || (existingInterpreter as Interpreter[]).length === 0) {
       return NextResponse.json(
         { error: 'Interpreter not found' },
         { status: 404 }

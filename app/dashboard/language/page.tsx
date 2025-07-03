@@ -1,4 +1,4 @@
-import {fetchLanguage} from '@/app/api/language/route';
+import {fetchLanguage} from '@/app/lib/language';
 import CreateLanguageForm from './CreateLanguageForm';
 import UpdateLanguageForm from './UpdateLanguageForm';
 import DeleteLanguageButton from './DeleteLanguageButton';

@@ -25,17 +25,10 @@ export async function DELETE(
     }
 
     // Delete the availability
-    const [result] = await conn.query(
+    await conn.query(
       'DELETE FROM availability_interpreter WHERE availability_id = ?',
       [availabilityId]
     );
-
-    if ((result as any).affectedRows === 0) {
-      return NextResponse.json(
-        { error: 'Availability not found' },
-        { status: 404 }
-      );
-    }
 
     return NextResponse.json(
       { message: 'Availability deleted successfully' },

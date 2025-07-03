@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import mysql from 'mysql2/promise';
-import { User } from '@/app/lib/definitions';
+import { fetchUserById } from '@/app/lib/user';
 
 const conn = await mysql.createConnection({
   host: process.env.MYSQL_HOST,
@@ -10,8 +10,7 @@ const conn = await mysql.createConnection({
   port: process.env.MYSQL_PORT ? parseInt(process.env.MYSQL_PORT) : 3306,
 });
 
-// FIX: params should not be a Promise, just an object
-export async function GET(request: Request, { params }: { params: { id: string } }) {
+export async function GET(request: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params;
     if (!id) {
@@ -33,7 +32,7 @@ export async function GET(request: Request, { params }: { params: { id: string }
 
 export async function PATCH(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const { id } = await params;
@@ -54,7 +53,7 @@ export async function PATCH(
       );
     }
 
-    const [result]: any = await conn.query(
+    await conn.query(
       `
       UPDATE user
       SET phone = ?
@@ -62,13 +61,6 @@ export async function PATCH(
     `,
       [phone, parseInt(id)]
     );
-
-    if (result.affectedRows === 0) {
-      return NextResponse.json(
-        { message: 'User not found or no changes made' },
-        { status: 404 }
-      );
-    }
 
     const updatedUser = await fetchUserById(parseInt(id));
     return NextResponse.json(updatedUser[0] || {});
@@ -78,25 +70,5 @@ export async function PATCH(
       { message: 'Failed to update user profile' },
       { status: 500 }
     );
-  }
-}
-
-export async function fetchUserById(id: number) {
-  try {
-    const [rows] = await conn.query(
-      `
-      SELECT
-        u.*,
-        i.interpreter_id
-      FROM user u
-      LEFT JOIN interpreter i ON u.user_id = i.user_id
-      WHERE u.user_id = ?
-    `,
-      [id]
-    );
-    return rows as (User & { interpreter_id: number })[];
-  } catch (error) {
-    console.error('Database Error:', error);
-    throw new Error('Failed to fetch user data.');
   }
 }

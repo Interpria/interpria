@@ -1,6 +1,6 @@
-import { fetchInterpreterById } from '@/app/api/interpreter/[id]/route';
-import { fetchAvailabilityInterpreterByInterpreterId } from '@/app/api/interpreter/[id]/availability/route';
-import { fetchInterpreterxattractionByInterpreterId } from '@/app/api/interpreterxattraction/interpreter/[interpreterId]/route';
+import { fetchInterpreterById } from '@/app/lib/interpreter';
+import { fetchAvailabilityInterpreterByInterpreterId } from '@/app/lib/availability-interpreter';
+import { fetchInterpreterxattractionByInterpreterId } from '@/app/lib/interpreterxattraction';
 import Link from 'next/link';
 import { Interpreterxattraction } from '@/app/lib/definitions';
 import UpdateLanguagesButton from './UpdateLanguagesButton';
@@ -70,7 +70,6 @@ export default async function InterpreterDetailsPage({
                       <div className="mt-2">
                         <UpdateLanguagesButton 
                           interpreterId={interpreterUser[0].interpreter_id}
-                          currentLanguages={interpreterUser[0].languages}
                         />
                       </div>
                     </td>

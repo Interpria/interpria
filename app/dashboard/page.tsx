@@ -1,5 +1,3 @@
-import Image from "next/image";
-import styles from "./page.module.css";
 import Link from "next/link";
 
 export default function Home() {
@@ -32,7 +30,7 @@ export default function Home() {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full max-w-3xl">
         <Link href='/dashboard/availability-attraction' className='flex flex-col items-center p-6 bg-white rounded-lg shadow hover:shadow-lg transition border border-blue-200 hover:bg-blue-50'>
           <span className="text-2xl mb-2">🕒🏛️</span>
-          <span className="font-semibold">Attraction's Availability</span>
+          <span className="font-semibold">Attraction Availability</span>
         </Link>
         <Link href='/dashboard/interpreterxlanguage' className='flex flex-col items-center p-6 bg-white rounded-lg shadow hover:shadow-lg transition border border-blue-200 hover:bg-blue-50'>
           <span className="text-2xl mb-2">🗣️🌐</span>
@@ -40,7 +38,7 @@ export default function Home() {
         </Link>
         <Link href='/dashboard/availability-interpreter' className='flex flex-col items-center p-6 bg-white rounded-lg shadow hover:shadow-lg transition border border-blue-200 hover:bg-blue-50'>
           <span className="text-2xl mb-2">🕒🗣️</span>
-          <span className="font-semibold">Interpreter's Availability</span>
+          <span className="font-semibold">Interpreter Availability</span>
         </Link>
         <Link href='/dashboard/interpreterxattraction' className='flex flex-col items-center p-6 bg-white rounded-lg shadow hover:shadow-lg transition border border-blue-200 hover:bg-blue-50'>
           <span className="text-2xl mb-2">🗣️🏛️</span>

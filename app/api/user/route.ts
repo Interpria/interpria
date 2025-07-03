@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import mysql from 'mysql2/promise';
-import { User } from '@/app/lib/definitions';
+import bcrypt from 'bcryptjs';
 
 const conn = await mysql.createConnection({
   host: process.env.MYSQL_HOST,
@@ -23,21 +23,10 @@ export async function GET() {
   }
 }
 
-export async function fetchUser() {
-  try {
-    const [rows] = await conn.query('SELECT * FROM `user`');
-    return rows as User[];
-  } catch (error) {
-    console.error('Database Error:', error);
-    throw new Error('Failed to fetch user data.');
-  }
-}
-
 export async function POST(request: Request) {
   try {
     const { email, name, role, phone } = await request.json();
     // Set default password as 'password' and hash it
-    const bcrypt = require('bcryptjs');
     const defaultPassword = 'password';
     const password_hash = await bcrypt.hash(defaultPassword, 10);
 

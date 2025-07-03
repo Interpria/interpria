@@ -10,17 +10,6 @@ const conn = await mysql.createConnection({
   port: process.env.MYSQL_PORT? parseInt(process.env.MYSQL_PORT) : 3306,
 });
 
-export async function fetchInterpreterxattraction() {
-
-  try {
-    const [rows] = await conn.query('SELECT * FROM `interpreterxattraction`');
-    return rows as Interpreterxattraction[];
-  }catch (error) {
-    console.error('Database Error:', error);
-    throw new Error('Failed to fetch interpreterxattraction data.');
-  }
-}
-
 export async function POST(request: Request) {
   try {
     const body = await request.json();
@@ -40,7 +29,7 @@ export async function POST(request: Request) {
       [interpreter_id, attraction_id]
     );
 
-    if ((existing as any[]).length > 0) {
+    if ((existing as Interpreterxattraction[]).length > 0) {
       return NextResponse.json(
         { error: 'This attraction is already assigned to this interpreter' },
         { status: 400 }
@@ -48,7 +37,7 @@ export async function POST(request: Request) {
     }
 
     // Add attraction to interpreter
-    const [result] = await conn.query(
+    await conn.query(
       `INSERT INTO interpreterxattraction 
        (interpreter_id, attraction_id, duration, price, buffer_time, max_traveler) 
        VALUES (?, ?, ?, ?, ?, ?)`,

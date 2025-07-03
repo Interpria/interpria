@@ -1,5 +1,5 @@
-import { fetchUserById } from '@/app/api/user/[id]/route';
-import { fetchBookingsByUserId } from '@/app/api/booking/user/[userId]/route';
+import { fetchUserById } from '@/app/lib/user';
+import { fetchBookingsByUserId } from '@/app/lib/booking';
 import Link from 'next/link';
 import CreateBookingForm from './CreateBookingForm';
 import DeleteBookingButton from './DeleteBookingButton';

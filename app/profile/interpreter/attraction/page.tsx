@@ -3,18 +3,20 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { fetchCurrentInterpreterId } from '@/app/components/CurrentInterpreter';
+import { AvailabilityInterpreter, Interpreterxattraction } from '@/app/lib/definitions';
 
 const weekdays = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
 export default function InterpreterAttractionsPage() {
   const [interpreterName, setInterpreterName] = useState<string>('');
   const [interpreterId, setInterpreterId] = useState<number | null>(null);
-  const [attractions, setAttractions] = useState<any[]>([]);
-  const [availability, setAvailability] = useState<any[]>([]);
+  const [interpreterAttractions, setInterpreterAttractions] = useState<Interpreterxattraction[]>([]);
+  const [availability, setAvailability] = useState<AvailabilityInterpreter[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<number | null>(null);
   const [deletingAvailabilityId, setDeletingAvailabilityId] = useState<number | null>(null);
+  const [attractionNames, setAttractionNames] = useState<Record<number, string>>({});
 
   useEffect(() => {
     const fetchData = async () => {
@@ -40,14 +42,13 @@ export default function InterpreterAttractionsPage() {
         // Fetch attractions for this interpreter
         const attrRes = await fetch(`/api/interpreterxattraction/interpreter/${id}`);
         const attrData = attrRes.ok ? await attrRes.json() : [];
-        setAttractions(attrData);
+        setInterpreterAttractions(attrData);
 
         // Fetch availability for this interpreter
         const availRes = await fetch(`/api/interpreter/${id}/availability`);
         const availData = availRes.ok ? await availRes.json() : [];
         setAvailability(availData);
-
-      } catch (err) {
+      } catch {
         setError('Failed to load data');
       } finally {
         setIsLoading(false);
@@ -55,6 +56,24 @@ export default function InterpreterAttractionsPage() {
     };
     fetchData();
   }, []);
+
+  useEffect(() => {
+    if (interpreterAttractions.length === 0) return;
+    const uniqueIds = Array.from(new Set(interpreterAttractions.map(a => a.attraction_id)));
+    const names: Record<number, string> = {};
+    Promise.all(
+      uniqueIds.map(async (id) => {
+        try {
+          const res = await fetch(`/api/attraction/${id}`);
+          if (res.ok) {
+            const data = await res.json();
+            const name = Array.isArray(data) ? data[0]?.name : data?.name;
+            if (name) names[id] = name;
+          }
+        } catch {}
+      })
+    ).then(() => setAttractionNames(names));
+  }, [interpreterAttractions]);
 
   const handleDelete = async (interpreterxattraction_id: number) => {
     if (!window.confirm('Are you sure you want to delete this attraction?')) return;
@@ -64,7 +83,7 @@ export default function InterpreterAttractionsPage() {
         method: 'DELETE',
       });
       if (res.ok) {
-        setAttractions((prev) => prev.filter(a => a.interpreterxattraction_id !== interpreterxattraction_id));
+        setInterpreterAttractions((prev) => prev.filter(a => a.interpreterxattraction_id !== interpreterxattraction_id));
       } else {
         alert('Failed to delete attraction.');
       }
@@ -140,16 +159,16 @@ export default function InterpreterAttractionsPage() {
                     </Link>
                   )}
                 </div>
-                <span className='badge bg-primary'>{attractions.length} Attractions</span>
+                <span className='badge bg-primary'>{interpreterAttractions.length} Attractions</span>
               </div>
 
-              {attractions.length > 0 ? (
+              {interpreterAttractions.length > 0 ? (
                 <div className='row g-3'>
-                  {attractions.map((attraction) => {
+                  {interpreterAttractions.map((attraction) => {
                     const attractionAvailability = availability.filter(
                       avail => avail.attraction_id === attraction.attraction_id
                     );
-
+                    
                     return (
                       <div key={attraction.interpreterxattraction_id} className='col-md-6'>
                         <div className='card h-100'>
@@ -157,7 +176,7 @@ export default function InterpreterAttractionsPage() {
                             <div className='d-flex justify-content-between align-items-center mb-3'>
                               <h5 className='card-title mb-0'>
                                 <Link href={`/dashboard/attraction/${attraction.attraction_id}`} className='text-decoration-none'>
-                                  {attraction.attraction_name}
+                                  {attractionNames[attraction.attraction_id] || 'Attraction'}
                                 </Link>
                               </h5>
                               <button

@@ -5,6 +5,7 @@ export interface JWTPayload {
   userId: number;
   email: string;
   role: string;
+  [key: string]: unknown;
 }
 
 // Secret key for JWT - should be in environment variables
@@ -36,7 +37,7 @@ export async function isAdmin(token: string): Promise<boolean> {
     const decoded = await verifyToken(token);
     const isAdminUser = decoded.role === 'admin';
     return isAdminUser;
-  } catch (error) {
+  } catch {
     return false;
   }
-} 
+}

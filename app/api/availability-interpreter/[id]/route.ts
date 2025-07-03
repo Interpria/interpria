@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import mysql from 'mysql2/promise';
+import { AvailabilityInterpreter } from '@/app/lib/definitions';
 
 const conn = await mysql.createConnection({
   host: process.env.MYSQL_HOST,
@@ -11,10 +12,10 @@ const conn = await mysql.createConnection({
 
 export async function GET(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id } = params;
+    const { id } = await params;
     const availabilityId = parseInt(id);
 
     if (isNaN(availabilityId)) {
@@ -30,14 +31,14 @@ export async function GET(
       [availabilityId]
     );
 
-    if ((rows as any[]).length === 0) {
+    if ((rows as AvailabilityInterpreter[]).length === 0) {
       return NextResponse.json(
         { error: 'Availability not found' },
         { status: 404 }
       );
     }
 
-    return NextResponse.json((rows as any[])[0], { status: 200 });
+    return NextResponse.json((rows as AvailabilityInterpreter[])[0], { status: 200 });
   } catch (error) {
     console.error('Database Error:', error);
     return NextResponse.json(
@@ -49,7 +50,7 @@ export async function GET(
 
 export async function DELETE(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const { id } = await params;
@@ -63,17 +64,10 @@ export async function DELETE(
     }
 
     // Delete the availability
-    const [result] = await conn.query(
+    await conn.query(
       'DELETE FROM availability_interpreter WHERE availability_id = ?',
       [availabilityId]
     );
-
-    if ((result as any).affectedRows === 0) {
-      return NextResponse.json(
-        { error: 'Availability not found' },
-        { status: 404 }
-      );
-    }
 
     return NextResponse.json(
       { message: 'Availability deleted successfully' },

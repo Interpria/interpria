@@ -4,6 +4,15 @@ import { Loader } from '@googlemaps/js-api-loader';
 import { Attraction } from '@/app/lib/definitions';
 import InterpreterSection from './components/InterpreterSection';
 
+const categoryColors: Record<string, string> = {
+  museum: 'blue',
+  art: 'purple',
+  nature: 'green',
+  historical: 'orange',
+  religion: 'red',
+  other: 'gray',
+};
+
 export default function Home() {
   const [attractions, setAttractions] = useState<Attraction[]>([]);
   const [map, setMap] = useState<google.maps.Map | null>(null);
@@ -13,16 +22,6 @@ export default function Home() {
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [searchTerm, setSearchTerm] = useState('');
   const markersRef = useRef<google.maps.Marker[]>([]);
-
-  // Category color mapping
-  const categoryColors: Record<string, string> = {
-    museum: 'blue',
-    art: 'purple',
-    nature: 'green',
-    historical: 'orange',
-    religion: 'red',
-    other: 'gray',
-  };
 
   // Filtered attractions by category and search
   const filteredAttractions = attractions.filter(a => {
@@ -58,15 +57,15 @@ export default function Home() {
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const data = await res.json();
         const valid = data
-          .filter((a: any) => !isNaN(+a.latitude) && !isNaN(+a.longitude))
-          .map((a: any) => ({
+          .filter((a: Attraction) => !isNaN(+a.latitude) && !isNaN(+a.longitude))
+          .map((a: Attraction) => ({
             ...a,
             latitude: +a.latitude,
             longitude: +a.longitude,
           }));
         setAttractions(valid);
-      } catch (err: any) {
-        console.error('Error fetching attractions:', err);
+      } catch (error) {
+        console.error('Error fetching attractions:', error);
         setErrorMessage('Could not load attractions.');
       }
     }

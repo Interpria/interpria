@@ -1,4 +1,4 @@
-import { fetchUser } from '@/app/api/user/route';
+import { fetchUser } from '@/app/lib/user';
 import Link from 'next/link';
 import CreateUserForm from './CreateUserForm';
 import UpdateUserForm from './UpdateUserForm';

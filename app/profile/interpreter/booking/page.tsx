@@ -1,12 +1,12 @@
 'use client';
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { Interpreter } from '@/app/lib/definitions';
+import { Booking, Interpreter } from '@/app/lib/definitions';
 import { fetchCurrentInterpreterId } from '@/app/components/CurrentInterpreter';
 
 export default function InterpreterBookingPage() {
   const [interpreter, setInterpreter] = useState<Interpreter | null>(null);
-  const [bookings, setBookings] = useState<any[]>([]);
+  const [bookings, setBookings] = useState<Booking[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -35,7 +35,7 @@ export default function InterpreterBookingPage() {
         }
         const data = await response.json();
         setInterpreter(Array.isArray(data) ? data[0] : data);
-      } catch (err) {
+      } catch {
         setError('Failed to load interpreter data');
       } finally {
         setIsLoading(false);
@@ -56,7 +56,7 @@ export default function InterpreterBookingPage() {
           } else {
             setBookings([]);
           }
-        } catch (err) {
+        } catch {
           setBookings([]);
         }
       }
@@ -79,7 +79,7 @@ export default function InterpreterBookingPage() {
           )
         );
       }
-    } catch (err) {
+    } catch {
       // Optionally show error
     }
   };
@@ -94,12 +94,21 @@ export default function InterpreterBookingPage() {
       if (res.ok) {
         setBookings((prev) => prev.map(b => b.booking_id === bookingId ? { ...b, status: 'cancelled' } : b));
       }
-    } catch (err) {
+    } catch {
       // Optionally show error
     }
   };
 
   if (isLoading) return <div className="container py-5">Loading...</div>;
+  if (error) {
+    return (
+      <div className="container py-5">
+        <div className="alert alert-danger" role="alert">
+          {error}
+        </div>
+      </div>
+    );
+  }
   if (!interpreter) return <div className="container py-5">User not found.</div>;
 
   // Separate bookings
@@ -113,7 +122,7 @@ export default function InterpreterBookingPage() {
   );
   const cancelledBookings = bookings.filter((b) => b.status === 'cancelled');
 
-  const BookingCard = ({ booking, showConfirm, showCancel }: { booking: any; showConfirm?: boolean; showCancel?: boolean }) => (
+  const BookingCard = ({ booking, showConfirm, showCancel }: { booking: Booking; showConfirm?: boolean; showCancel?: boolean }) => (
     <div className="col-md-4 mb-3">
       <div className="card h-100">
         <div className="card-body">

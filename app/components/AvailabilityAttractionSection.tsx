@@ -30,7 +30,7 @@ export default function AvailabilityAttractionSection({ attractionId }: Props) {
         } else {
           setAvailability([]);
         }
-      } catch (err: any) {
+      } catch {
         setError('Could not load availability.');
         setAvailability([]);
       } finally {
@@ -60,7 +60,7 @@ export default function AvailabilityAttractionSection({ attractionId }: Props) {
       // Refresh list
       const data = await res.json();
       setAvailability((prev) => [...prev, data]);
-    } catch (err: any) {
+    } catch {
       setError('Failed to add availability.');
     } finally {
       setSubmitting(false);
@@ -74,7 +74,7 @@ export default function AvailabilityAttractionSection({ attractionId }: Props) {
       const res = await fetch(`/api/availability-attraction/${id}`, { method: 'DELETE' });
       if (!res.ok) throw new Error('Failed to delete');
       setAvailability((prev) => prev.filter((slot) => slot.availability_id !== id));
-    } catch (err: any) {
+    } catch {
       setError('Failed to delete availability.');
     }
   };

@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import mysql from 'mysql2/promise';
-import { Interpreterxattraction } from '@/app/lib/definitions';
+import { fetchInterpreterxattractionByInterpreterId } from '@/app/lib/interpreterxattraction';
 
 const conn = await mysql.createConnection({
   host: process.env.MYSQL_HOST,
@@ -9,23 +9,6 @@ const conn = await mysql.createConnection({
   database: process.env.MYSQL_DATABASE,
   port: process.env.MYSQL_PORT? parseInt(process.env.MYSQL_PORT) : 3306,
 });
-
-export async function fetchInterpreterxattractionByInterpreterId(interpreterId: number) {
-  try {
-    const [rows] = await conn.query(`
-      SELECT 
-        ixa.*,
-        a.name as attraction_name
-      FROM interpreterxattraction ixa
-      LEFT JOIN attraction a ON ixa.attraction_id = a.attraction_id
-      WHERE ixa.interpreter_id = ?
-    `, [interpreterId]);
-    return rows as (Interpreterxattraction & { attraction_name: string })[];
-  }catch (error) {
-    console.error('Database Error:', error);
-    throw new Error('Failed to fetch interpreterxattraction data.');
-  }
-}
 
 export async function GET(request: Request, { params }: { params: Promise<{ interpreterId: string }> }) {
   try {
@@ -60,7 +43,7 @@ export async function POST(
     }
 
     // Add attraction to interpreter
-    const [result] = await conn.query(
+    await conn.query(
       `INSERT INTO interpreterxattraction 
        (interpreter_id, attraction_id, duration, buffer_time, max_traveler, price) 
        VALUES (?, ?, ?, ?, ?, ?)`,

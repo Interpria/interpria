@@ -1,10 +1,11 @@
 'use client';
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { Booking, User } from '@/app/lib/definitions';
 
 export default function UserBookingPage() {
-  const [user, setUser] = useState<any>(null);
-  const [bookings, setBookings] = useState<any[]>([]);
+  const [user, setUser] = useState<User | null>(null);
+  const [bookings, setBookings] = useState<Booking[]>([]);
   const [loading, setLoading] = useState(true);
   const [ratingModal, setRatingModal] = useState<{ open: boolean, bookingId: number | null }>({ open: false, bookingId: null });
   const [ratingValue, setRatingValue] = useState<number>(5);
@@ -34,7 +35,7 @@ export default function UserBookingPage() {
         } else {
           setUser(null);
         }
-      } catch (err) {
+      } catch {
         setUser(null);
       } finally {
         setLoading(false);
@@ -55,7 +56,7 @@ export default function UserBookingPage() {
           } else {
             setBookings([]);
           }
-        } catch (err) {
+        } catch {
           setBookings([]);
         }
       }
@@ -73,7 +74,7 @@ export default function UserBookingPage() {
       if (res.ok) {
         setBookings((prev) => prev.map(b => b.booking_id === bookingId ? { ...b, status: 'cancelled' } : b));
       }
-    } catch (err) {
+    } catch {
       // Optionally show error
     }
   };
@@ -100,7 +101,7 @@ export default function UserBookingPage() {
       setRatingSuccess('Thank you for your rating!');
       setBookings((prev) => prev.map(b => b.booking_id === ratingModal.bookingId ? { ...b, rated: true, rating: ratingValue } : b));
       setTimeout(() => setRatingModal({ open: false, bookingId: null }), 1200);
-    } catch (err) {
+    } catch {
       setRatingError('Failed to submit rating');
     } finally {
       setRatingLoading(false);
@@ -121,7 +122,7 @@ export default function UserBookingPage() {
   );
   const cancelledBookings = bookings.filter((b) => b.status === 'cancelled');
 
-  const BookingCard = ({ booking, showCancel, showRate }: { booking: any, showCancel?: boolean, showRate?: boolean }) => (
+  const BookingCard = ({ booking, showCancel, showRate }: { booking: Booking, showCancel?: boolean, showRate?: boolean }) => (
     <div className="col-md-4 mb-3">
       <div className="card h-100">
         <div className="card-body">

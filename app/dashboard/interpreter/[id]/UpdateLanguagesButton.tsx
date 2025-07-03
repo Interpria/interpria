@@ -6,10 +6,10 @@ import { Language } from '@/app/lib/definitions';
 
 type Props = {
   interpreterId: number;
-  currentLanguages: string;
+  // currentLanguages: string[];
 };
 
-export default function UpdateLanguagesButton({ interpreterId, currentLanguages }: Props) {
+export default function UpdateLanguagesButton({ interpreterId }: Props) {
   const router = useRouter();
   const [showModal, setShowModal] = useState(false);
   const [languages, setLanguages] = useState<Language[]>([]);

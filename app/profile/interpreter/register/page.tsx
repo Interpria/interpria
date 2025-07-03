@@ -2,11 +2,10 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { Language, User } from '@/app/lib/definitions';
+import { Language } from '@/app/lib/definitions';
 
 export default function CreateInterpreterPage() {
   const router = useRouter();
-  const [user, setUser] = useState<User | null>(null);
   const [languages, setLanguages] = useState<Language[]>([]);
   const [loading, setLoading] = useState(true);
   const [formData, setFormData] = useState({
@@ -28,7 +27,6 @@ export default function CreateInterpreterPage() {
             const userRes = await fetch(`/api/user/${data.user.userId}`);
             const userData = await userRes.json();
             const currentUser = Array.isArray(userData) ? userData[0] : userData;
-            setUser(currentUser);
             setFormData(prev => ({
               ...prev,
               user_id: currentUser.user_id?.toString() || ''
@@ -102,6 +100,19 @@ export default function CreateInterpreterPage() {
       setError(error instanceof Error ? error.message : 'An error occurred');
     }
   };
+
+  if (loading) {
+    return (
+      <div className="container py-5">
+        <div className="text-center">
+          <div className="spinner-border" role="status">
+            <span className="visually-hidden">Loading...</span>
+          </div>
+          <p className="mt-2">Loading...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className='container py-5'>

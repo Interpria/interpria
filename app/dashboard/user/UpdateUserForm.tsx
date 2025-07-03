@@ -12,7 +12,7 @@ export default function UpdateUserForm({ user, isExpanded = false }: UpdateUserF
   const [email, setEmail] = useState(user.email);
   const [name, setName] = useState(user.name);
   const [role, setRole] = useState<'user' | 'attraction' | 'admin'>(user.role);
-  const [phone_num, setPhoneNum] = useState(user.phone_num);
+  const [phone, setPhone] = useState(user.phone);
   const [isEditing, setIsEditing] = useState(false);
 
   const toggleEdit = () => {
@@ -37,7 +37,7 @@ export default function UpdateUserForm({ user, isExpanded = false }: UpdateUserF
           email, 
           name, 
           role, 
-          phone_num 
+          phone: phone || null
         }),
       });
 
@@ -97,8 +97,8 @@ export default function UpdateUserForm({ user, isExpanded = false }: UpdateUserF
             <label className="form-label">Phone</label>
             <input
               type="tel"
-              value={phone_num}
-              onChange={(e) => setPhoneNum(e.target.value)}
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
               placeholder="Phone Number"
               className="form-control"
             />

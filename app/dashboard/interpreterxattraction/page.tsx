@@ -1,4 +1,4 @@
-import {fetchInterpreterxattraction} from '@/app/api/interpreterxattraction/route';
+import {fetchInterpreterxattraction} from '@/app/lib/interpreterxattraction';
 
 export default async function InterpreterAttractionPage() {
   const interpreterAttractions = await fetchInterpreterxattraction();

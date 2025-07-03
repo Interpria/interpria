@@ -9,7 +9,7 @@ database: process.env.MYSQL_DATABASE,
 port: process.env.MYSQL_PORT ? parseInt(process.env.MYSQL_PORT) : 3306,
 });
 
-export async function POST(request: NextRequest, { params }: { params: { id: string } }) {
+export async function POST(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   let rating: number;
   try {

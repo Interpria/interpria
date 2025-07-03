@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import mysql from 'mysql2/promise';
 import bcrypt from 'bcrypt';
+import { User } from '@/app/lib/definitions';
 
 const conn = await mysql.createConnection({
   host: process.env.MYSQL_HOST,
@@ -12,7 +13,7 @@ const conn = await mysql.createConnection({
 
 export async function POST(request: Request) {
   try {
-    const { name, email, password, role, phone } = await request.json();
+    const { name, email, password, phone } = await request.json();
 
     // Validate input
     if (!name || !email || !password) {
@@ -28,7 +29,7 @@ export async function POST(request: Request) {
       [email]
     );
 
-    if ((existingUsers as any[]).length > 0) {
+    if ((existingUsers as User[]).length > 0) {
       return NextResponse.json(
         { error: 'Email already registered' },
         { status: 400 }
@@ -40,7 +41,7 @@ export async function POST(request: Request) {
     const passwordHash = await bcrypt.hash(password, saltRounds);
 
     // Insert new user
-    const [result] = await conn.query(
+    await conn.query(
       'INSERT INTO user (name, email, password_hash, role, phone) VALUES (?, ?, ?, ?, ?)',
       [name, email, passwordHash, 'traveler', phone || null]
     );

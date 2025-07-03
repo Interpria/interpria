@@ -10,34 +10,6 @@ const conn = await mysql.createConnection({
   port: process.env.MYSQL_PORT? parseInt(process.env.MYSQL_PORT) : 3306,
 })
 
-export async function fetchBooking() {
-  try {
-    const [rows] = await conn.query(`
-      SELECT 
-        b.*,
-        u.name as user_name,
-        i.name as interpreter_name,
-        a.name as attraction_name,
-        l.name as language_name
-      FROM booking b
-      LEFT JOIN user u ON b.user_id = u.user_id
-      LEFT JOIN interpreter i2 ON b.interpreter_id = i2.interpreter_id
-      LEFT JOIN user i ON i2.user_id = i.user_id
-      LEFT JOIN attraction a ON b.attraction_id = a.attraction_id
-      LEFT JOIN language l ON b.language_id = l.language_id
-    `);
-    return rows as (Booking & {
-      user_name: string;
-      interpreter_name: string;
-      attraction_name: string;
-      language_name: string;
-    })[];
-  }catch (error) {
-    console.error('Database Error:', error);
-    throw new Error('Failed to fetch booking data.');
-  }
-}
-
 export async function POST(request: Request) {
   try {
     const body = await request.json();
@@ -77,15 +49,14 @@ export async function POST(request: Request) {
       start_time, end_time
     ]);
 
-    if ((existingBookings as any[]).length > 0) {
+    if ((existingBookings as Booking[]).length > 0) {
       return NextResponse.json(
         { error: 'Interpreter is not available for the selected time slot' },
         { status: 400 }
       );
     }
 
-    // Create the booking
-    const [result] = await conn.query(`
+    await conn.query(`
       INSERT INTO booking (
         user_id, 
         interpreter_id, 

@@ -44,7 +44,7 @@ export default function InterpreterViewPage() {
         }
         const data = await response.json();
         setInterpreterUser(Array.isArray(data) ? data[0] : data);
-      } catch (err) {
+      } catch {
         setError('Failed to load interpreter data');
       } finally {
         setIsLoading(false);

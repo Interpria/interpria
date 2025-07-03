@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server';
 import mysql from 'mysql2/promise';
-import { Language } from '@/app/lib/definitions';
 
 const conn = await mysql.createConnection({
   host: process.env.MYSQL_HOST,
@@ -23,16 +22,6 @@ export async function GET() {
       { message: 'Failed to fetch languages' },
       { status: 500 }
     );
-  }
-}
-
-export async function fetchLanguage() {
-  try {
-    const [rows] = await conn.query('SELECT * FROM `language`');
-    return rows as Language[];
-  }catch (error) {
-    console.error('Database Error:', error);
-    throw new Error('Failed to fetch language data.');
   }
 }
 

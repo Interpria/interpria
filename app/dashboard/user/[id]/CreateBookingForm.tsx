@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { Attraction, Interpreter, Language } from '@/app/lib/definitions';
 
 interface CreateBookingFormProps {
   userId: number;
@@ -10,9 +11,9 @@ interface CreateBookingFormProps {
 
 export default function CreateBookingForm({ userId, userName }: CreateBookingFormProps) {
   const router = useRouter();
-  const [interpreters, setInterpreters] = useState<any[]>([]);
-  const [attractions, setAttractions] = useState<any[]>([]);
-  const [languages, setLanguages] = useState<any[]>([]);
+  const [interpreters, setInterpreters] = useState<(Interpreter & { name: string })[]>([]);
+  const [attractions, setAttractions] = useState<Attraction[]>([]);
+  const [languages, setLanguages] = useState<Language[]>([]);
   const [selectedInterpreter, setSelectedInterpreter] = useState<number | ''>('');
   const [selectedAttraction, setSelectedAttraction] = useState<number | ''>('');
   const [selectedLanguage, setSelectedLanguage] = useState<number | ''>('');

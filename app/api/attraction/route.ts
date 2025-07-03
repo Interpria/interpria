@@ -1,52 +1,22 @@
 import { NextResponse } from 'next/server';
 import mysql from 'mysql2/promise';
-import { Attraction, Interpreterxattraction, AvailabilityAttraction } from '@/app/lib/definitions';
 
-const conn = await mysql.createConnection({
-  host: process.env.MYSQL_HOST,
-  user: process.env.MYSQL_USER,
-  password: process.env.MYSQL_PASSWORD,
-  database: process.env.MYSQL_DATABASE,
-});
-
-export async function fetchAttraction() {
-  try {
-    const [rows] = await conn.query('SELECT * FROM `attraction`');
-    return rows as Attraction[];
-  }catch (error) {
-    console.error('Database Error:', error);
-    throw new Error('Failed to fetch attraction data.');
+let conn: mysql.Connection | null = null;
+async function getConn() {
+  if (!conn) {
+    conn = await mysql.createConnection({
+      host: process.env.MYSQL_HOST,
+      user: process.env.MYSQL_USER,
+      password: process.env.MYSQL_PASSWORD,
+      database: process.env.MYSQL_DATABASE,
+    });
   }
-}
-
-
-
-export async function fetchAvailabilityAttraction() {
-  try {
-    const [rows] = await conn.query('SELECT * FROM `availability_attraction`');
-    return rows as AvailabilityAttraction[];
-  }catch (error) {
-    console.error('Database Error:', error);
-    throw new Error('Failed to fetch availability_attraction data.');
-  }
-}
-
-export async function fetchInterpreterxattractionByAttractionId(attractionId: number) {
-  try {
-    const [rows] = await conn.query(`
-      SELECT ixa.*
-      FROM interpreterxattraction ixa
-      WHERE ixa.attraction_id = ?
-    `, [attractionId]);
-    return rows as (Interpreterxattraction)[];
-  }catch (error) {
-    console.error('Database Error:', error);
-    throw new Error('Failed to fetch interpreterxattraction data.');
-  }
+  return conn;
 }
 
 export async function GET() {
   try {
+    const conn = await getConn();
     const [rows] = await conn.query('SELECT * FROM attraction');
     return NextResponse.json(rows);
   } catch (error) {
@@ -57,6 +27,7 @@ export async function GET() {
 
 export async function POST(request: Request) {
   try {
+    const conn = await getConn();
     const { name, description, address, postal_code, city, province, country, email, phone, website, category, longitude, latitude } = await request.json();
 
     const [result] = await conn.query(
@@ -73,6 +44,7 @@ export async function POST(request: Request) {
 
 export async function PUT(request: Request) {
   try {
+    const conn = await getConn();
     const { attraction_id, name, description, address, postal_code, city, province, country, email, phone, website, category, longitude, latitude } = await request.json();
 
     const [result] = await conn.query(

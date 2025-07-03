@@ -1,11 +1,12 @@
 'use client';
 import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
+import { Booking } from '@/app/lib/definitions';
 
 export default function BookingDetailsPage() {
   const { id } = useParams();
   const router = useRouter();
-  const [booking, setBooking] = useState<any>(null);
+  const [booking, setBooking] = useState<Booking | null>(null);
   const [loading, setLoading] = useState(true);
 
   const formatDateTime = (dateTimeStr: string) => {

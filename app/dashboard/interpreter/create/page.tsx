@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { Language, User } from '@/app/lib/definitions';
+import { Interpreter, Language, User } from '@/app/lib/definitions';
 
 export default function CreateInterpreterPage() {
   const router = useRouter();
@@ -36,7 +36,7 @@ export default function CreateInterpreterPage() {
         const interpreters = await interpreterResponse.json();
 
         // Filter out users who are already interpreters
-        const interpreterUserIds = interpreters.map((i: any) => i.user_id);
+        const interpreterUserIds = interpreters.map((i: Interpreter) => i.user_id);
         const availableUsers = usersData.filter((user: User) => !interpreterUserIds.includes(user.user_id));
 
         setUsers(availableUsers);

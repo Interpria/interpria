@@ -1,4 +1,4 @@
-import { fetchBooking } from '@/app/api/booking/route';
+import { fetchBooking } from '@/app/lib/booking';
 
 export default async function BookingPage() {
   const bookings = await fetchBooking();

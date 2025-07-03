@@ -2,12 +2,12 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { Language } from '@/app/lib/definitions';
+import { Interpreter, Language } from '@/app/lib/definitions';
 import { fetchCurrentInterpreterId } from '@/app/components/CurrentInterpreter';
 
 export default function UpdateInterpreterPage() {
   const router = useRouter();
-  const [interpreter, setInterpreter] = useState<any>(null);
+  const [interpreter, setInterpreter] = useState<Interpreter | null>(null);
   const [languages, setLanguages] = useState<Language[]>([]);
   const [loading, setLoading] = useState(true);
   const [formData, setFormData] = useState({
@@ -44,7 +44,7 @@ export default function UpdateInterpreterPage() {
           introduction: interpreterData.introduction || '',
           primary_language_id: interpreterData.primary_language_id ? interpreterData.primary_language_id.toString() : '',
         });
-      } catch (err) {
+      } catch {
         setError('Failed to load interpreter data');
       } finally {
         setLoading(false);
@@ -62,7 +62,7 @@ export default function UpdateInterpreterPage() {
         }
         const languagesData = await response.json();
         setLanguages(languagesData);
-      } catch (error) {
+      } catch {
         setError('Failed to load languages');
       }
     };

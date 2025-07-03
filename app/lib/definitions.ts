@@ -7,6 +7,7 @@ export type User = {
     phone: string;
     created_at: Date;
     updated_at: Date;
+    interpreter_id?: number | null;
 };
   
 export type Interpreter = {
@@ -47,6 +48,7 @@ export type Attraction = {
   latitude: number;
   created_at: Date;
   updated_at: Date;
+  // interpreterxattractions: Interpreterxattraction[];
 };
 
 export type Interpreterxlanguage = {
@@ -93,11 +95,15 @@ export type AvailabilityInterpreter = {
 export type Booking = {
   booking_id: number;
   user_id: number;
+  user_name: string;
   interpreter_id: number;
+  interpreter_name: string;
   attraction_id: number;
+  attraction_name: string;
   start_time: string;
   end_time: string;
   language_id: number;
+  language_name: string;
   num_people: number;
   price: number;
   status: 'pending' | 'confirmed' | 'cancelled' | 'rated';

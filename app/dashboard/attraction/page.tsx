@@ -1,4 +1,4 @@
-import {fetchAttraction} from '@/app/api/attraction/route';
+import {fetchAttraction} from '@/app/lib/attraction';
 import Link from 'next/link';
 import DeleteAttractionButton from './DeleteAttractionButton';
 

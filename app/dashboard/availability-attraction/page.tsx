@@ -1,12 +1,11 @@
-import {fetchAvailabilityAttraction} from '@/app/api/attraction/route';
-import Link from 'next/link';
+import {fetchAvailabilityAttraction} from '@/app/lib/attraction';
 
 export default async function AvailabilityAttractionPage() {
   const availabilityAttractions = await fetchAvailabilityAttraction();
     return (  
       <>
         <div className='d-flex flex-column align-items-center justify-content-center gap-3 p-5 m-5'>
-          <h1>Manage Attraction's Availability</h1>
+          <h1>Manage Attraction Availability</h1>
 
           <table className="table table-striped">
             <thead>

@@ -1,6 +1,6 @@
-import { fetchInterpreterxattractionByAttractionId } from '@/app/api/attraction/route';
-import { fetchAttractionById } from '@/app/api/attraction/[id]/route';
-import { fetchInterpreterById } from '@/app/api/interpreter/[id]/route';
+import { fetchInterpreterxattractionByAttractionId } from '@/app/lib/attraction';
+import { fetchAttractionById } from '@/app/lib/attraction';
+import { fetchInterpreterById } from '@/app/lib/interpreter';
 import Link from 'next/link';
 import DeleteAttractionButton from '../DeleteAttractionButton';
 import AvailabilityAttractionSection from '@/app/components/AvailabilityAttractionSection';

@@ -1,4 +1,4 @@
-import { fetchInterpreter } from '@/app/api/interpreter/route';
+import { fetchInterpreter } from '@/app/lib/interpreter';
 import Link from 'next/link';
 import DeleteInterpreterButton from './DeleteInterpreterButton';
 

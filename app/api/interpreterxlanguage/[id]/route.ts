@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server';
 import mysql from 'mysql2/promise';
-import { Interpreterxlanguage } from '@/app/lib/definitions';
 
 const conn = await mysql.createConnection({
   host: process.env.MYSQL_HOST,
@@ -46,7 +45,7 @@ export async function PUT(
 
 export async function GET(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const { id } = await params;
@@ -74,15 +73,4 @@ export async function GET(
   }
 }
 
-export async function fetchInterpreterxlanguageByInterpreterId(interpreterId: number) {
-  try {
-    const [rows] = await conn.query(
-      'SELECT * FROM `interpreterxlanguage` WHERE interpreter_id = ?',
-      [interpreterId]
-    );
-    return rows as Interpreterxlanguage[];
-  } catch (error) {
-    console.error('Database Error:', error);
-    throw new Error('Failed to fetch interpreterxlanguage data.');
-  }
-}
+

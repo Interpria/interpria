@@ -1,9 +1,10 @@
 'use client';
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { User } from '@/app/lib/definitions';
 
 export default function ProfilePage() {
-  const [user, setUser] = useState<any>(null);
+  const [user, setUser] = useState<User| null>(null);
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState(false);
   const [phone, setPhone] = useState('');
@@ -20,9 +21,9 @@ export default function ProfilePage() {
       try {
         const res = await fetch('/api/auth/login');
         if (res.ok) {
-          const data = await res.json();
-          if (data && data.user && data.user.userId) {
-            const userRes = await fetch(`/api/user/${data.user.userId}`);
+          const data : User = await res.json();
+          if (data && data.user_id) {
+            const userRes = await fetch(`/api/user/${data.user_id}`);
             const userData = await userRes.json();
             const userObj = userData && Array.isArray(userData) ? userData[0] : userData;
             setUser(userObj);
@@ -33,7 +34,7 @@ export default function ProfilePage() {
         } else {
           setUser(null);
         }
-      } catch (err) {
+      } catch {
         setUser(null);
       } finally {
         setLoading(false);
@@ -57,16 +58,16 @@ export default function ProfilePage() {
     setSaving(true);
     setError(null);
     try {
-      const res = await fetch(`/api/user/${user.user_id}`, {
+      const res = await fetch(`/api/user/${user?.user_id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ phone }),
       });
       if (!res.ok) throw new Error('Failed to update phone number');
       const updatedUser = await res.json();
-      setUser((prev: any) => ({ ...prev, phone: updatedUser.phone || phone }));
+      setUser(prev => prev ? { ...prev, phone: updatedUser.phone || phone } : prev);
       setEditing(false);
-    } catch (err) {
+    } catch {
       setError('Failed to update phone number');
     } finally {
       setSaving(false);
@@ -92,7 +93,7 @@ export default function ProfilePage() {
       setShowReset(false);
       setResetPassword("");
       setResetConfirm("");
-    } catch (err) {
+    } catch {
       setResetError("Failed to reset password");
     }
   };
@@ -160,7 +161,7 @@ export default function ProfilePage() {
                   <th>Interpreter:</th>
                   <td>
                     {user.interpreter_id ? (
-                      <Link href={`/profile/interpreter`}>Go to Interpreter's profile</Link>
+                      <Link href={`/profile/interpreter`}>Go to Interpreter&apos;s profile</Link>
                     ) : (
                       'Not registered as interpreter'
                     )}

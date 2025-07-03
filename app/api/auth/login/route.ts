@@ -1,9 +1,10 @@
-import { NextResponse, NextRequest  } from 'next/server';
+import { NextResponse  } from 'next/server';
 import mysql from 'mysql2/promise';
 import bcrypt from 'bcrypt';
 import { createToken } from '@/lib/jwt';
 import { verifyToken } from '@/lib/jwt';      // implement this to verify your token
 import { cookies } from 'next/headers';       // for Next.js 13+ App Router
+import { User } from '@/app/lib/definitions';
 
 const conn = await mysql.createConnection({
   host: process.env.MYSQL_HOST,
@@ -26,12 +27,13 @@ export async function POST(request: Request) {
     }
 
     // Find user by email
-    const [users] = await conn.query(
+    const [rows] = await conn.query(
       'SELECT * FROM user WHERE email = ?',
       [email]
     );
+    const users = rows as User[];
 
-    const user = (users as any[])[0];
+    const user = users[0];
 
     if (!user) {
       return NextResponse.json(
@@ -101,7 +103,7 @@ export async function GET() {
 
     // 3) Return the decoded data
     return NextResponse.json({ user: payload });
-  } catch (err: any) {
+  } catch (err) {
     console.error('GET /api/me error:', err);
     return NextResponse.json(
       { error: 'Forbidden' },
