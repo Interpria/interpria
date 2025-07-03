@@ -1,4 +1,4 @@
-import { Attraction, Interpreterxattraction, AvailabilityAttraction } from '@/app/lib/definitions';
+import { Attraction, Interpreterxattraction } from '@/app/lib/definitions';
 import pool from '@/app/lib/db';
 
 export async function fetchAttraction() {
@@ -18,16 +18,6 @@ export async function fetchAttractionById(id: number) {
   } catch (error) {
     console.error('Database Error:', error);
     throw new Error('Failed to fetch attraction data.');
-  }
-}
-
-export async function fetchAvailabilityAttraction() {
-  try {
-    const [rows] = await pool.query('SELECT * FROM `availability_attraction`');
-    return rows as AvailabilityAttraction[];
-  }catch (error) {
-    console.error('Database Error:', error);
-    throw new Error('Failed to fetch availability_attraction data.');
   }
 }
 

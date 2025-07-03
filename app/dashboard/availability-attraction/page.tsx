@@ -1,4 +1,4 @@
-import {fetchAvailabilityAttraction} from '@/app/lib/attraction';
+import {fetchAvailabilityAttraction} from '@/app/lib/availability-attraction';
 
 export default async function AvailabilityAttractionPage() {
   const availabilityAttractions = await fetchAvailabilityAttraction();

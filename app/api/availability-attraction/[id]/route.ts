@@ -1,7 +1,8 @@
 import { NextResponse } from 'next/server';
 import pool from '@/app/lib/db';
-import { AvailabilityAttraction } from '@/app/lib/definitions';
+import { fetchAvailabilityAttractionByAttractionId } from '@/app/lib/availability-attraction';
 
+// by attraction ID
 export async function GET(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
@@ -13,13 +14,7 @@ export async function GET(
   }
 
   try {
-    const [rows] = await pool.query(
-      'SELECT * FROM availability_attraction WHERE attraction_id = ?',
-      [attractionId]
-    );
-    if ((rows as AvailabilityAttraction[]).length === 0) {
-      return NextResponse.json({ error: 'Availability not found' }, { status: 404 });
-    }
+    const rows = await fetchAvailabilityAttractionByAttractionId(attractionId);
     return NextResponse.json(rows, { status: 200 });
   } catch (error) {
     console.error('Database Error:', error);

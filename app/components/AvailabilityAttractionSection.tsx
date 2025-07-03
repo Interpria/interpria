@@ -4,11 +4,7 @@ import { AvailabilityAttraction } from '@/app/lib/definitions';
 
 const weekdayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
-interface Props {
-  attractionId: number;
-}
-
-export default function AvailabilityAttractionSection({ attractionId }: Props) {
+export default function AvailabilityAttractionSection({ attractionId }: { attractionId: number; }) {
   const [availability, setAvailability] = useState<AvailabilityAttraction[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -25,8 +21,7 @@ export default function AvailabilityAttractionSection({ attractionId }: Props) {
           const response = await fetch(`/api/availability-attraction/${attractionId}`);
           if (!response.ok) throw new Error('Failed to fetch availability');
           const data = await response.json();
-          const normalized = Array.isArray(data) ? data : (data ? [data] : []);
-          console.log('Fetched availability:', normalized);
+          setAvailability(data);
         } else {
           setAvailability([]);
         }
