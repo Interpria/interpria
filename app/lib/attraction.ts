@@ -1,23 +1,9 @@
 import { Attraction, Interpreterxattraction, AvailabilityAttraction } from '@/app/lib/definitions';
-import mysql from 'mysql2/promise';
-
-let conn: mysql.Connection | null = null;
-async function getConn() {
-  if (!conn) {
-    conn = await mysql.createConnection({
-      host: process.env.MYSQL_HOST,
-      user: process.env.MYSQL_USER,
-      password: process.env.MYSQL_PASSWORD,
-      database: process.env.MYSQL_DATABASE,
-    });
-  }
-  return conn;
-}
+import pool from '@/app/lib/db';
 
 export async function fetchAttraction() {
   try {
-    const conn = await getConn();
-    const [rows] = await conn.query('SELECT * FROM `attraction`');
+    const [rows] = await pool.query('SELECT * FROM `attraction`');
     return rows as Attraction[];
   }catch (error) {
     console.error('Database Error:', error);
@@ -27,8 +13,7 @@ export async function fetchAttraction() {
 
 export async function fetchAttractionById(id: number) {
   try {
-    const conn = await getConn();
-    const [rows] = await conn.query('SELECT * FROM `attraction` WHERE `attraction_id` = ?', [id]);
+    const [rows] = await pool.query('SELECT * FROM `attraction` WHERE `attraction_id` = ?', [id]);
     return rows as Attraction[];
   } catch (error) {
     console.error('Database Error:', error);
@@ -38,8 +23,7 @@ export async function fetchAttractionById(id: number) {
 
 export async function fetchAvailabilityAttraction() {
   try {
-    const conn = await getConn();
-    const [rows] = await conn.query('SELECT * FROM `availability_attraction`');
+    const [rows] = await pool.query('SELECT * FROM `availability_attraction`');
     return rows as AvailabilityAttraction[];
   }catch (error) {
     console.error('Database Error:', error);
@@ -49,8 +33,7 @@ export async function fetchAvailabilityAttraction() {
 
 export async function fetchInterpreterxattractionByAttractionId(attractionId: number) {
   try {
-    const conn = await getConn();
-    const [rows] = await conn.query(`
+    const [rows] = await pool.query(`
       SELECT ixa.*
       FROM interpreterxattraction ixa
       WHERE ixa.attraction_id = ?

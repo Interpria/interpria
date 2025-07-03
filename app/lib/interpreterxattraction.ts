@@ -1,17 +1,9 @@
-import mysql from 'mysql2/promise';
+import pool from '@/app/lib/db';
 import { Interpreterxattraction } from '@/app/lib/definitions';
-
-const conn = await mysql.createConnection({
-  host: process.env.MYSQL_HOST,
-  user: process.env.MYSQL_USER,
-  password: process.env.MYSQL_PASSWORD,
-  database: process.env.MYSQL_DATABASE,
-  port: process.env.MYSQL_PORT? parseInt(process.env.MYSQL_PORT) : 3306,
-});
 
 export async function fetchInterpreterxattraction() {
   try {
-    const [rows] = await conn.query('SELECT * FROM `interpreterxattraction`');
+    const [rows] = await pool.query('SELECT * FROM `interpreterxattraction`');
     return rows as Interpreterxattraction[];
   }catch (error) {
     console.error('Database Error:', error);
@@ -21,7 +13,7 @@ export async function fetchInterpreterxattraction() {
 
 export async function fetchInterpreterxattractionByInterpreterId(interpreterId: number) {
   try {
-    const [rows] = await conn.query(`
+    const [rows] = await pool.query(`
       SELECT 
         ixa.*,
         a.name as attraction_name

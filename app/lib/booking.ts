@@ -1,17 +1,9 @@
-import mysql from 'mysql2/promise';
+import pool from '@/app/lib/db';
 import { Booking } from '@/app/lib/definitions';
-
-const conn = await mysql.createConnection({
-  host: process.env.MYSQL_HOST,
-  user: process.env.MYSQL_USER,
-  password: process.env.MYSQL_PASSWORD,
-  database: process.env.MYSQL_DATABASE,
-  port: process.env.MYSQL_PORT? parseInt(process.env.MYSQL_PORT) : 3306,
-});
 
 export async function fetchBooking() {
   try {
-    const [rows] = await conn.query(`
+    const [rows] = await pool.query(`
       SELECT 
         b.*,
         u.name as user_name,
@@ -39,7 +31,7 @@ export async function fetchBooking() {
 
 export async function fetchBookingsById(id: number) {
   try {
-    const [rows] = await conn.query(`
+    const [rows] = await pool.query(`
       SELECT 
         b.*,
         u.name as user_name,
@@ -68,7 +60,7 @@ export async function fetchBookingsById(id: number) {
 
 export async function fetchBookingsByUserId(userId: number) {
   try {
-    const [rows] = await conn.query(`
+    const [rows] = await pool.query(`
       SELECT 
         b.*,
         u.name as user_name,
@@ -97,7 +89,7 @@ export async function fetchBookingsByUserId(userId: number) {
 
 export async function fetchBookingsByInterpreterId(interpreterId: number) {
   try {
-    const [rows] = await conn.query(`
+    const [rows] = await pool.query(`
       SELECT 
         b.*,
         u.name as user_name,

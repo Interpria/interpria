@@ -1,17 +1,9 @@
-import mysql from 'mysql2/promise';
+import pool from '@/app/lib/db';
 import { Interpreter, User } from '@/app/lib/definitions';
-
-const conn = await mysql.createConnection({
-  host: process.env.MYSQL_HOST,
-  user: process.env.MYSQL_USER,
-  password: process.env.MYSQL_PASSWORD,
-  database: process.env.MYSQL_DATABASE,
-  port: process.env.MYSQL_PORT? parseInt(process.env.MYSQL_PORT) : 3306,
-});
 
 export async function fetchInterpreter() {
   try {
-    const [rows] = await conn.query(`
+    const [rows] = await pool.query(`
       SELECT
         i.*,
         u.name,
@@ -32,7 +24,7 @@ export async function fetchInterpreter() {
 
 export async function fetchInterpreterById(id: number) {
   try {
-    const [rows] = await conn.query(`
+    const [rows] = await pool.query(`
       SELECT 
         i.*,
         u.*,
