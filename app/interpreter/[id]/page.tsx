@@ -39,7 +39,7 @@ export default function InterpreterViewPage({
 }: {
   params: Promise<{ id: string }>
 }) {
-  const [interpreterUser, setInterpreterUser] = useState<InterpreterData[]>([]);
+  const [interpreterUser, setInterpreterUser] = useState<InterpreterData | null>(null);
   const [interpreterxattraction, setInterpreterxattraction] = useState<Interpreterxattraction[]>([]);
   const [availabilityInterpreter, setAvailabilityInterpreter] = useState<AvailabilityData[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -116,7 +116,7 @@ export default function InterpreterViewPage({
     );
   }
 
-  if (!interpreterUser || interpreterUser.length === 0) {
+  if (!interpreterUser) {
     return (
       <div className='container py-5'>
         <div className='alert alert-warning' role='alert'>
@@ -130,11 +130,11 @@ export default function InterpreterViewPage({
     <div className='container py-5'>
       <div className='card'>
         <div className='card-header d-flex justify-content-between align-items-center'>
-          <h1 className='card-title mb-0'>{interpreterUser[0].name}</h1>
-          {interpreterUser[0].rating ? (
+          <h1 className='card-title mb-0'>{interpreterUser.name}</h1>
+          {interpreterUser.rating ? (
             <span className="d-flex align-items-center ms-3">
               <i className="bi bi-star-fill" style={{ fontSize: 24, color: 'var(--orange-deep)' }}></i>
-              <span className="ms-1 text-lg fw-semibold">{interpreterUser[0].rating}</span>
+              <span className="ms-1 text-lg fw-semibold">{interpreterUser.rating}</span>
             </span>
           ) : null}
         </div>               
@@ -145,20 +145,20 @@ export default function InterpreterViewPage({
                 <tbody>
                   <tr>
                     <th>Gender:</th>
-                    <td>{interpreterUser[0].gender}</td>
+                    <td>{interpreterUser.gender}</td>
                   </tr>
                   <tr>
                     <th>Introduction:</th>
-                    <td>{interpreterUser[0].introduction}</td>
+                    <td>{interpreterUser.introduction}</td>
                   </tr>
                   <tr>
                     <th>Language:</th>
-                    <td>{interpreterUser[0].primary_language}{interpreterUser[0].languages && (',' + interpreterUser[0].languages)}</td>
+                    <td>{interpreterUser.primary_language}{interpreterUser.languages && (',' + interpreterUser.languages)}</td>
                   </tr>
                   <tr>
                     <th>Email:</th>
-                    <td>{interpreterUser[0].email}</td>
-                  </tr> 
+                    <td>{interpreterUser.email}</td>
+                  </tr>
                 </tbody>
               </table>
             </div>
@@ -236,7 +236,7 @@ export default function InterpreterViewPage({
 
               {attractionId && (
                 <BookingForm
-                  interpreterId={interpreterUser[0].interpreter_id}
+                  interpreterId={interpreterUser.interpreter_id}
                   attractionId={parseInt(attractionId, 10)}
                 />
               )}

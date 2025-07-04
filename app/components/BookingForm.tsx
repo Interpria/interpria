@@ -6,9 +6,8 @@ import { Interpreter, Language } from '../lib/definitions';
 
 export default function BookingForm({ interpreterId, attractionId }: { interpreterId: number, attractionId: number }) {
   const router = useRouter();
-  const [languages, setLanguages] = useState<Language[]>([]);
   const [selectedLanguage, setSelectedLanguage] = useState<number | ''>('');
-  const [interpreterName, setInterpreterName] = useState<string>('');
+  const [interpreterDetail, setInterpreterDetail] = useState<(Partial<Interpreter> & { name: string; languages: string; primary_language: string })>({ name: '', languages: '', primary_language: '' });
   const [attractionName, setAttractionName] = useState<string>('');
   const [formData, setFormData] = useState({
     start_time: '',
@@ -18,27 +17,20 @@ export default function BookingForm({ interpreterId, attractionId }: { interpret
   });
   const [error, setError] = useState<string | null>(null);
   const [userId, setUserId] = useState<number | null>(null);
-  const [interpreterLanguages, setInterpreterLanguages] = useState<number[]>([]);
+  const [interpreterLanguages, setInterpreterLanguages] = useState<{ language_id: number; name: string }[]>([]);
   const [price, setPrice] = useState<number | null>(null);
   const [showSuccess, setShowSuccess] = useState(false);
 
   useEffect(() => {
     const loadData = async () => {
       try {
-        // Fetch all languages
-        const languageResponse = await fetch('/api/language');
-        if (!languageResponse.ok) throw new Error('Failed to fetch languages');
-        const languageData = await languageResponse.json();
-        setLanguages(languageData);
-
-        let interpreterData: (Partial<Interpreter> & { name: string; languages: string; primary_language: string }) = { name: '', languages: '', primary_language: '' };
         // Fetch interpreter details
+        let interpreterData: (Partial<Interpreter> & { name: string; languages: string; primary_language: string }) = { name: '', languages: '', primary_language: '' };
         const interpreterResponse = await fetch(`/api/interpreter/${interpreterId}`);
         if (interpreterResponse.ok) {
           interpreterData = await interpreterResponse.json();
-          setInterpreterName(
-            interpreterData?.name || (Array.isArray(interpreterData) ? interpreterData[0]?.name : '')
-          );
+          setInterpreterDetail(interpreterData);
+          console.log('Interpreter Data:', interpreterData);
         }
 
         // fetch the existing languages
@@ -49,40 +41,30 @@ export default function BookingForm({ interpreterId, attractionId }: { interpret
         }
         const interpreterLanguagesData: { language_id: number; name: string }[] = await langRes.json();
 
-        // fetch interpreter details (if not already fetched)
-        let primary_language_id: number | undefined = undefined;
-        let primary_language_name: string | undefined = undefined;
-        if (interpreterData?.primary_language_id && interpreterData?.primary_language) {
-          primary_language_id = interpreterData.primary_language_id;
-          primary_language_name = interpreterData.primary_language;
-        }
-
-        // add primary language if not already in the list
+        // Ensure primary language is included only if not already present and valid
         if (
-          primary_language_id !== undefined &&
-          !interpreterLanguagesData.some(lang => lang.language_id === primary_language_id)
+          interpreterData.primary_language_id &&
+          interpreterData.primary_language &&
+          !interpreterLanguagesData.some(lang => lang.language_id === interpreterData.primary_language_id)
         ) {
           interpreterLanguagesData.push({
-            language_id: primary_language_id,
-            name: primary_language_name!,
+            language_id: interpreterData.primary_language_id,
+            name: interpreterData.primary_language
           });
         }
 
-        // 4. pull out just the IDs into your state
-        setInterpreterLanguages(interpreterLanguagesData.map((lang) => lang.language_id));
+        setInterpreterLanguages(interpreterLanguagesData.map((lang) => ({ language_id: lang.language_id, name: lang.name })));
 
         // Fetch attraction details
         const attractionResponse = await fetch(`/api/attraction/${attractionId}`);
         if (attractionResponse.ok) {
           const attractionData = await attractionResponse.json();
-          console.log('Attraction Data:', attractionData);
           setAttractionName(attractionData?.name || (Array.isArray(attractionData) ? attractionData[0]?.name : ''));
         }
 
         const interpretAttractionResponse = await fetch(`/api/interpreterxattraction/interpreter/${interpreterId}/${attractionId}`);
         if (interpretAttractionResponse.ok) {
           const interpretAttractionData = await interpretAttractionResponse.json();
-          console.log('Interpretation Attraction Data:', interpretAttractionData);
           setPrice(interpretAttractionData?.price || null);
         } else {
           setError('Failed to fetch interpretation details for the attraction');
@@ -188,7 +170,7 @@ export default function BookingForm({ interpreterId, attractionId }: { interpret
               <input
                 type="text"
                 className="form-control"
-                value={interpreterName}
+                value={interpreterDetail.name}
                 readOnly
               />
             </div>
@@ -210,13 +192,11 @@ export default function BookingForm({ interpreterId, attractionId }: { interpret
                 required
               >
                 <option value="">Select a language</option>
-                {languages
-                  .filter((language) => interpreterLanguages.includes(language.language_id))
-                  .map((language) => (
-                    <option key={language.language_id} value={language.language_id}>
-                      {language.name}
-                    </option>
-                  ))}
+                {interpreterLanguages.map((language) => (
+                  <option key={language.language_id} value={language.language_id}>
+                    {language.name}
+                  </option>
+                ))}
               </select>
             </div>
             <div className="col-md-6">

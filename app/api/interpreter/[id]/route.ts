@@ -61,7 +61,7 @@ export async function PUT(
     );
 
     const updatedInterpreter = await fetchInterpreterById(parseInt(id));
-    return NextResponse.json(updatedInterpreter[0] || {});
+    return NextResponse.json(updatedInterpreter || {});
   } catch (error) {
     console.error('Database Error:', error);
     return NextResponse.json(

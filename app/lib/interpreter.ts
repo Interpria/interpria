@@ -37,10 +37,11 @@ export async function fetchInterpreterById(id: number) {
       WHERE i.interpreter_id = ?
       GROUP BY i.interpreter_id
     `, [id]);
-    return rows as (Interpreter & User & {
+    const row = Array.isArray(rows) && rows.length > 0 ? rows[0] : null;
+    return row as (Interpreter & User & {
       languages: string;
       primary_language: string;
-    })[];
+    }) | null;
   }catch (error) {
     console.error('Database Error:', error);
     throw new Error('Failed to fetch interpreter data.');
