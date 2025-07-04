@@ -35,7 +35,7 @@ export default async function InterpreterDetailsPage({
 
       <div className='card'>
         <div className='card-header'>
-          <h1 className='card-title mb-0'>{interpreterUser[0].name}</h1>
+          <h1 className='card-title mb-0'>{interpreterUser?.name}</h1>
         </div>
         <div className='card-body mt-2'>
           <div className='row'>
@@ -45,42 +45,42 @@ export default async function InterpreterDetailsPage({
                 <tbody>
                   <tr>
                     <th>ID:</th>
-                    <td>{interpreterUser[0].interpreter_id}</td>
+                    <td>{interpreterUser?.interpreter_id}</td>
                   </tr>
                   <tr>
                     <th>Gender:</th>
-                    <td>{interpreterUser[0].gender}</td>
+                    <td>{interpreterUser?.gender}</td>
                   </tr>
                   <tr>
                     <th>Bio:</th>
-                    <td>{interpreterUser[0].bio}</td>
+                    <td>{interpreterUser?.bio}</td>
                   </tr>
                   <tr>
                     <th>Introduction:</th>
-                    <td>{interpreterUser[0].introduction}</td>
+                    <td>{interpreterUser?.introduction}</td>
                   </tr>
                   <tr>
                     <th>Primary Language:</th>
-                    <td>{interpreterUser[0].primary_language}</td>
+                    <td>{interpreterUser?.primary_language}</td>
                   </tr>
                   <tr>
                     <th>Other Languages:</th>
                     <td>
-                      {interpreterUser[0].languages}
-                      <div className="mt-2">
+                      {interpreterUser?.languages}
+                      {interpreterUser && <div className="mt-2">
                         <UpdateLanguagesButton 
-                          interpreterId={interpreterUser[0].interpreter_id}
+                          interpreterId={interpreterUser.interpreter_id}
                         />
-                      </div>
+                      </div>}
                     </td>
                   </tr>
                   <tr>
                     <th>Created At:</th>
-                    <td>{new Date(interpreterUser[0].created_at).toLocaleDateString()}</td>
+                    <td>{interpreterUser ? new Date(interpreterUser.created_at).toLocaleDateString() : 'N/A'}</td>
                   </tr>
                   <tr>
                     <th>Updated At:</th>
-                    <td>{new Date(interpreterUser[0].updated_at).toLocaleDateString()}</td>
+                    <td>{interpreterUser ? new Date(interpreterUser.updated_at).toLocaleDateString() : 'N/A'}</td>
                   </tr>
                 </tbody>
               </table>
@@ -92,19 +92,19 @@ export default async function InterpreterDetailsPage({
                 <tbody>
                   <tr>
                     <th>User ID:</th>
-                    <td><Link href={`/dashboard/user/${interpreterUser[0].user_id}`}>{interpreterUser[0].user_id}</Link></td>
+                    <td><Link href={`/dashboard/user/${interpreterUser?.user_id}`}>{interpreterUser?.user_id}</Link></td>
                   </tr>
                   <tr>
                     <th>Name:</th>
-                    <td>{interpreterUser[0].name}</td>
+                    <td>{interpreterUser?.name}</td>
                   </tr>
                   <tr>
                     <th>Email:</th>
-                    <td>{interpreterUser[0].email}</td>
+                    <td>{interpreterUser?.email}</td>
                   </tr>
                   <tr>
                     <th>Phone Number:</th>
-                    <td>{interpreterUser[0].phone || 'Not provided'}</td>
+                    <td>{interpreterUser?.phone || 'Not provided'}</td>
                   </tr>
                 </tbody>
               </table>

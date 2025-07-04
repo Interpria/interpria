@@ -66,7 +66,7 @@ export default async function AttractionDetailsPage({
                 <div className='row g-3'>
                   {interpreterxattraction.map((interpreter) => {
                     const interpreterUsers = interpreterById.filter(
-                      (interpreterData) => interpreterData.interpreter_id === interpreter.interpreter_id
+                      (interpreterData) => interpreterData?.interpreter_id === interpreter.interpreter_id
                     );
                     
                     if (!interpreterUsers || interpreterUsers.length === 0) {
@@ -81,7 +81,7 @@ export default async function AttractionDetailsPage({
                           <div className='card-body'>
                             <h5 className='card-title'>
                               <Link href={`/dashboard/interpreter/${interpreter.interpreter_id}`} className='text-decoration-none'>
-                                {interpreterData.name}
+                                {interpreterData?.name}
                               </Link>
                             </h5>
                             <div className='card-text'>
@@ -90,7 +90,7 @@ export default async function AttractionDetailsPage({
                                 <li>Buffer Time: {interpreter.buffer_time || 0} mins</li>
                                 <li>Max Travelers: {interpreter.max_traveler || 'No limit'}</li>
                                 <li>Price: {interpreter.price ? `${interpreter.price} CAD` : 'Free'}</li>
-                                <li>Language: {interpreterData.primary_language}{interpreterData.languages && (',' + interpreterData.languages)}</li>
+                                <li>Language: {interpreterData?.primary_language}{interpreterData?.languages && (',' + interpreterData?.languages)}</li>
                               </ul>
                             </div>
                           </div>
