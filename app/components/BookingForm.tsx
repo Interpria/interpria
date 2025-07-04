@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { Interpreter, Language } from '../lib/definitions';
+import { Interpreter } from '@/app/lib/definitions';
 
 export default function BookingForm({ interpreterId, attractionId }: { interpreterId: number, attractionId: number }) {
   const router = useRouter();
