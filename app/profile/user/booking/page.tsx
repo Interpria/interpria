@@ -2,6 +2,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { Booking, User } from '@/app/lib/definitions';
+import { fetchCurrentUserId } from '@/app/components/CurrentUser';
 
 export default function UserBookingPage() {
   const [user, setUser] = useState<User | null>(null);
@@ -20,28 +21,22 @@ export default function UserBookingPage() {
   };
 
   useEffect(() => {
-    const fetchCurrentUser = async () => {
+    const getUser = async () => {
+      setLoading(true);
+      setUser(null);
       try {
-        const res = await fetch('/api/auth/login');
-        if (res.ok) {
-          const data = await res.json();
-          if (data && data.user && data.user.userId) {
-            const userRes = await fetch(`/api/user/${data.user.userId}`);
-            const userData = await userRes.json();
-            setUser(userData && Array.isArray(userData) ? userData[0] : userData);
-          } else {
-            setUser(null);
-          }
-        } else {
-          setUser(null);
-        }
+        const userId = await fetchCurrentUserId();
+        console.log('Current user ID:', userId);
+        const userRes = await fetch(`/api/user/${userId}`);
+        const userData = await userRes.json();
+        setUser(Array.isArray(userData) ? userData[0] : userData);
       } catch {
         setUser(null);
       } finally {
         setLoading(false);
       }
     };
-    fetchCurrentUser();
+    getUser();
   }, []);
 
   useEffect(() => {

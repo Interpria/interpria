@@ -2,6 +2,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { User } from '@/app/lib/definitions';
+import { fetchCurrentUserId } from '@/app/components/CurrentUser';
 
 export default function ProfilePage() {
   const [user, setUser] = useState<User| null>(null);
@@ -17,30 +18,22 @@ export default function ProfilePage() {
   const [resetSuccess, setResetSuccess] = useState("");
 
   useEffect(() => {
-    const fetchCurrentUser = async () => {
+    const getUser = async () => {
+      setLoading(true);
+      setUser(null);
       try {
-        const res = await fetch('/api/auth/login');
-        if (res.ok) {
-          const data : User = await res.json();
-          if (data && data.user_id) {
-            const userRes = await fetch(`/api/user/${data.user_id}`);
-            const userData = await userRes.json();
-            const userObj = userData && Array.isArray(userData) ? userData[0] : userData;
-            setUser(userObj);
-            setPhone(userObj?.phone || '');
-          } else {
-            setUser(null);
-          }
-        } else {
-          setUser(null);
-        }
+        const userId = await fetchCurrentUserId();
+        console.log('Current user ID:', userId);
+        const userRes = await fetch(`/api/user/${userId}`);
+        const userData = await userRes.json();
+        setUser(Array.isArray(userData) ? userData[0] : userData);
       } catch {
         setUser(null);
       } finally {
         setLoading(false);
       }
     };
-    fetchCurrentUser();
+    getUser();
   }, []);
 
   const handleEdit = () => {
