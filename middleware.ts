@@ -10,6 +10,7 @@ export async function middleware(request: NextRequest) {
   if (request.nextUrl.pathname.startsWith('/dashboard')) {
     if (!token) {
       // Redirect to login if no token
+      console.log('Middleware: No token found, redirecting to login');
       return NextResponse.redirect(new URL('/auth/login', request.url));
     }
 
@@ -21,7 +22,6 @@ export async function middleware(request: NextRequest) {
         // Redirect to home if not admin
         return NextResponse.redirect(new URL('/', request.url));
       }
-
       // Allow access if admin
       return NextResponse.next();
     } catch (error) {
@@ -35,5 +35,5 @@ export async function middleware(request: NextRequest) {
 
 // Configure which routes to run middleware on
 export const config = {
-  matcher: '/dashboard/:path*',
-}; 
+  matcher: [ '/dashboard', '/dashboard/:path*' ],
+}
