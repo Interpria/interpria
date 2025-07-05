@@ -3,6 +3,8 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { Booking, User } from '@/app/lib/definitions';
 import { fetchCurrentUserId } from '@/app/components/CurrentUser';
+import { parseAsLocal } from '@/app/lib/utils';
+
 
 export default function UserBookingPage() {
   const [user, setUser] = useState<User | null>(null);
@@ -13,11 +15,6 @@ export default function UserBookingPage() {
   const [ratingLoading, setRatingLoading] = useState(false);
   const [ratingError, setRatingError] = useState<string | null>(null);
   const [ratingSuccess, setRatingSuccess] = useState<string | null>(null);
-
-  const formatDateTime = (dateTimeStr: string) => {
-    const date = new Date(dateTimeStr);
-    return date.toLocaleString();
-  };
 
   useEffect(() => {
     const getUser = async () => {
@@ -130,10 +127,10 @@ export default function UserBookingPage() {
             Interpreter: {booking.interpreter_name}
           </h6>
           <div>
-            <strong>Start:</strong> {formatDateTime(booking.start_time)}
+            <strong>Start:</strong> {parseAsLocal(booking.start_time).toString()}
           </div>
           <div>
-            <strong>End:</strong> {formatDateTime(booking.end_time)}
+            <strong>End:</strong> {parseAsLocal(booking.end_time).toString()}
           </div>
           {showCancel && (
             <button className="btn btn-danger btn-sm mt-2" onClick={() => handleCancelBooking(booking.booking_id)}>

@@ -3,17 +3,13 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { Booking, Interpreter } from '@/app/lib/definitions';
 import { fetchCurrentInterpreterId } from '@/app/components/CurrentInterpreter';
+import { parseAsLocal } from '@/app/lib/utils';
 
 export default function InterpreterBookingPage() {
   const [interpreter, setInterpreter] = useState<Interpreter | null>(null);
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-
-  const formatDateTime = (dateTimeStr: string) => {
-    const date = new Date(dateTimeStr);
-    return date.toLocaleString();
-  };
 
   useEffect(() => {
     const getInterpreter = async () => {
@@ -135,10 +131,10 @@ export default function InterpreterBookingPage() {
             Participant: {booking.user_name}
           </h6>
           <div>
-            <strong>Start:</strong> {formatDateTime(booking.start_time)}
+            <strong>Start:</strong> {parseAsLocal(booking.start_time).toString()}
           </div>
           <div>
-            <strong>End:</strong> {formatDateTime(booking.end_time)}
+            <strong>End:</strong> {parseAsLocal(booking.end_time).toString()}
           </div>
           {showConfirm && (
             <button

@@ -16,11 +16,6 @@ export default async function UserDetailsPage({
     fetchBookingsByUserId(userId)
   ]);
 
-  const formatDateTime = (dateTimeStr: string) => {
-    const date = new Date(dateTimeStr);
-    return date.toLocaleString();
-  };
-
   return (
     <div className='container py-5'>
       <div className='mb-4'>
@@ -102,8 +97,8 @@ export default async function UserDetailsPage({
                     <tr key={booking.booking_id}>
                       <td>{booking.interpreter_name}</td>
                       <td>{booking.attraction_name}</td>
-                      <td>{formatDateTime(booking.start_time)}</td>
-                      <td>{formatDateTime(booking.end_time)}</td>
+                      <td>{booking.start_time.toString()}</td>
+                      <td>{booking.end_time.toString()}</td>
                       <td>{booking.language_name}</td>
                       <td>{booking.num_people}</td>
                       <td>{booking.price}</td>

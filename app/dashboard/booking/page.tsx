@@ -3,11 +3,6 @@ import { fetchBooking } from '@/app/lib/booking';
 export default async function BookingPage() {
   const bookings = await fetchBooking();
 
-  const formatDateTime = (dateTimeStr: string) => {
-    const date = new Date(dateTimeStr);
-    return date.toLocaleString();
-  };
-
   return (  
     <>
       <div className='d-flex flex-column align-items-center justify-content-center gap-3 p-5 m-5'>
@@ -35,8 +30,8 @@ export default async function BookingPage() {
                 <td>{booking.user_name}</td>
                 <td>{booking.interpreter_name}</td>
                 <td>{booking.attraction_name}</td>
-                <td>{formatDateTime(booking.start_time)}</td>
-                <td>{formatDateTime(booking.end_time)}</td>
+                <td>{(booking.start_time).toString()}</td>
+                <td>{(booking.end_time).toString()}</td>
                 <td>{booking.language_name}</td>
                 <td>{booking.num_people}</td>
                 <td>{booking.price}</td>
