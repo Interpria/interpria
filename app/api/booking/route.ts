@@ -1,5 +1,4 @@
 import { NextResponse } from 'next/server';
-import { Booking } from '@/app/lib/definitions';
 import pool from '@/app/lib/db';
 
 export async function POST(request: Request) {
@@ -25,28 +24,28 @@ export async function POST(request: Request) {
       );
     }
 
-    // Check if the interpreter is available for the selected time slot
-    const [existingBookings] = await pool.query(`
-      SELECT * FROM booking 
-      WHERE interpreter_id = ? 
-      AND (
-        (start_time <= ? AND end_time >= ?) OR
-        (start_time <= ? AND end_time >= ?) OR
-        (start_time >= ? AND end_time <= ?)
-      )
-    `, [
-      interpreter_id,
-      start_time, start_time,
-      end_time, end_time,
-      start_time, end_time
-    ]);
+    // // Check if the interpreter is available for the selected time slot
+    // const [existingBookings] = await pool.query(`
+    //   SELECT * FROM booking 
+    //   WHERE interpreter_id = ? 
+    //   AND (
+    //     (start_time <= ? AND end_time >= ?) OR
+    //     (start_time <= ? AND end_time >= ?) OR
+    //     (start_time >= ? AND end_time <= ?)
+    //   )
+    // `, [
+    //   interpreter_id,
+    //   start_time, start_time,
+    //   end_time, end_time,
+    //   start_time, end_time
+    // ]);
 
-    if ((existingBookings as Booking[]).length > 0) {
-      return NextResponse.json(
-        { error: 'Interpreter is not available for the selected time slot' },
-        { status: 400 }
-      );
-    }
+    // if ((existingBookings as Booking[]).length > 0) {
+    //   return NextResponse.json(
+    //     { error: 'Interpreter is not available for the selected time slot' },
+    //     { status: 400 }
+    //   );
+    // }
 
     await pool.query(`
       INSERT INTO booking (
