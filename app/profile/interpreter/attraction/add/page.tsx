@@ -220,7 +220,7 @@ export default function AddAttractionPage() {
             </div>
                       
             <div className="mb-3">
-              <label htmlFor="price" className="form-label">Price (CAD)</label>
+              <label htmlFor="price" className="form-label">Price / person (CAD)</label>
               <input
                 type="number"
                 className="form-control"

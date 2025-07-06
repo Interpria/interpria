@@ -183,13 +183,7 @@ export default function UserBookingPage() {
           <div className="row">            
             {upcomingBookings.length > 0 ? (
               upcomingBookings.map((booking) => (
-                <Link
-                  href={`/profile/user/booking/${booking.booking_id}`}
-                  className="text-decoration-none text-dark"
-                  key={booking.booking_id}
-                >
-                  <BookingCard booking={booking} showCancel />
-                </Link>
+                <BookingCard booking={booking} showCancel />
               ))
             ) : (
               <p className="text-muted mb-0">No upcoming bookings found</p>
