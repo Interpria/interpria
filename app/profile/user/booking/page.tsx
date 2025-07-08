@@ -183,7 +183,7 @@ export default function UserBookingPage() {
           <div className="row">            
             {upcomingBookings.length > 0 ? (
               upcomingBookings.map((booking) => (
-                <BookingCard booking={booking} showCancel />
+                <BookingCard key={booking.booking_id} booking={booking} showCancel />
               ))
             ) : (
               <p className="text-muted mb-0">No upcoming bookings found</p>
