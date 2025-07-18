@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import pool from '@/app/lib/db';
 import bcrypt from 'bcrypt';
 import { User } from '@/app/lib/definitions';
+import crypto from 'crypto';
 
 export async function POST(request: Request) {
   try {
@@ -32,11 +33,16 @@ export async function POST(request: Request) {
     const saltRounds = 10;
     const passwordHash = await bcrypt.hash(password, saltRounds);
 
-    // Insert new user
+    // Generate verification token
+    const verificationToken = crypto.randomBytes(32).toString('hex');
+
+    // Insert new user with is_verified and verification_token
     await pool.query(
-      'INSERT INTO user (name, email, password_hash, role, phone) VALUES (?, ?, ?, ?, ?)',
-      [name, email, passwordHash, 'traveler', phone || null]
+      'INSERT INTO user (name, email, password_hash, role, phone, is_verified, verification_token) VALUES (?, ?, ?, ?, ?, ?, ?)',
+      [name, email, passwordHash, 'user', phone || null, false, verificationToken]
     );
+
+    // Send verification email here
 
     return NextResponse.json(
       { message: 'Registration successful' },
